@@ -23,7 +23,7 @@ public class PrestamoService {
     //para calcular el interes
 
     //solicitar prestamo
-    public Prestamo solicitarPrestamo(PrestamoDto prestamoDto) {
+    public Prestamo solicitarPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException {
         Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
         Prestamo prestamo = new Prestamo(prestamoDto, cliente);
         if (prestamo.getNumeroCliente() == null) {

@@ -18,15 +18,18 @@ public class Cliente extends Persona{
     private Set<Cuenta> cuentas = new HashSet<>();
     private Set<Prestamo> prestamos = new HashSet<>();
     private int score;
+    private boolean activo;
 
     public Cliente() {
         super();
     }
     public Cliente(ClienteDto clienteDto) {
-        super(clienteDto.getDni(), clienteDto.getApellido(), clienteDto.getNombre(), clienteDto.getFechaNacimiento());
+        super(clienteDto.getDni(), clienteDto.getApellido(), clienteDto.getNombre(), clienteDto.getFechaNacimiento(), clienteDto.getTelefono(), clienteDto.getEmail());
+        tipoPersona = TipoPersona.fromString(clienteDto.getTipoPersona());
         fechaAlta = LocalDate.now();
         banco = clienteDto.getBanco();
         score = clienteDto.getScore();
+        activo = true;
     }
 
     public TipoPersona getTipoPersona() {
@@ -53,6 +56,14 @@ public class Cliente extends Persona{
         this.fechaAlta = fechaAlta;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     public Set<Cuenta> getCuentas() {
         return cuentas;
     }
@@ -60,6 +71,8 @@ public class Cliente extends Persona{
     public Set<Prestamo> getPrestamos() {
         return prestamos;
     }
+
+
 
     public int getScore() {
         if (prestamos.isEmpty()) {
@@ -95,6 +108,7 @@ public class Cliente extends Persona{
         }
         return false;
     }
+
 
     @Override
     public String toString() {

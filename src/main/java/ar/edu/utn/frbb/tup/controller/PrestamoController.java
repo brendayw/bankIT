@@ -4,6 +4,7 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.controller.validator.PrestamoValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Prestamo;
+import ar.edu.utn.frbb.tup.model.exception.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import ar.edu.utn.frbb.tup.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class PrestamoController {
     @Autowired private ClienteService clienteService;
 
     @PostMapping
-    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) {
+    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException {
         prestamoValidator.validate(prestamoDto);
         Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
         Prestamo prestamo = new Prestamo(prestamoDto, cliente);

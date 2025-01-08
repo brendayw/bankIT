@@ -15,7 +15,7 @@ public class ClienteValidator {
         try {
             LocalDate.parse(clienteDto.getFechaNacimiento());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error en el formato de fecha");
+            throw new IllegalArgumentException("Error en el formato de fecha. Ingrese 'yyyy-mm-dd'");
         }
     }
 }

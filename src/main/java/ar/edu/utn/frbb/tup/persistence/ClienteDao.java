@@ -2,7 +2,9 @@ package ar.edu.utn.frbb.tup.persistence;
 
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.exception.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
+import ch.qos.logback.core.net.server.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,24 @@ public class ClienteDao extends AbstractBaseDao {
     public void save(Cliente cliente) {
         ClienteEntity entity = new ClienteEntity(cliente);
         getInMemoryDatabase().put(entity.getId(), entity);
+    }
+
+    public Cliente update(Cliente cliente) throws ClientNoExisteException {
+        Cliente actualizado = find(cliente.getDni(), true);
+        if(actualizado  != null) {
+            if (cliente.getEmail() != null) {
+                actualizado .setEmail(cliente.getEmail());
+            }
+            if (cliente.getTelefono() != null) {
+                actualizado .setTelefono(cliente.getTelefono());
+            }
+
+            System.out.println("Datos actualizados con exito.");
+
+        } else {
+            throw new ClientNoExisteException("Cliente no encontrado.");
+        }
+        return actualizado;
     }
 
     @Override
