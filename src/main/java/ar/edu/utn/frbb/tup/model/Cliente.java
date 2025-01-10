@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Cliente extends Persona{
-
     private TipoPersona tipoPersona;
     private String banco;
     private LocalDate fechaAlta;
@@ -20,6 +19,7 @@ public class Cliente extends Persona{
     private int score;
     private boolean activo;
 
+    //constructores
     public Cliente() {
         super();
     }
@@ -32,10 +32,10 @@ public class Cliente extends Persona{
         activo = true;
     }
 
+    //getters y setters
     public TipoPersona getTipoPersona() {
         return tipoPersona;
     }
-
     public void setTipoPersona(TipoPersona tipoPersona) {
         this.tipoPersona = tipoPersona;
     }
@@ -43,7 +43,6 @@ public class Cliente extends Persona{
     public String getBanco() {
         return banco;
     }
-
     public void setBanco(String banco) {
         this.banco = banco;
     }
@@ -51,7 +50,6 @@ public class Cliente extends Persona{
     public LocalDate getFechaAlta() {
         return fechaAlta;
     }
-
     public void setFechaAlta(LocalDate fechaAlta) {
         this.fechaAlta = fechaAlta;
     }
@@ -59,7 +57,6 @@ public class Cliente extends Persona{
     public boolean isActivo() {
         return activo;
     }
-
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
@@ -67,13 +64,11 @@ public class Cliente extends Persona{
     public Set<Cuenta> getCuentas() {
         return cuentas;
     }
-
     public Set<Prestamo> getPrestamos() {
         return prestamos;
     }
 
-
-
+    //metodos
     public int getScore() {
         if (prestamos.isEmpty()) {
             return 700;
@@ -91,7 +86,7 @@ public class Cliente extends Persona{
 
     public void addCuenta(Cuenta cuenta) {
         this.cuentas.add(cuenta);
-        cuenta.setTitular(this);
+        cuenta.setDniTitular(cuenta.getDniTitular());
     }
 
     public void addPrestamo(Prestamo prestamo) {
@@ -102,7 +97,16 @@ public class Cliente extends Persona{
     public boolean tieneCuenta(TipoCuenta tipoCuenta, TipoMoneda moneda) {
         for (Cuenta cuenta:
                 cuentas) {
-            if (tipoCuenta.equals(cuenta.getTipoCuenta()) && moneda.equals(cuenta.getMoneda())) {
+            if (tipoCuenta.equals(cuenta.getTipoCuenta()) && moneda.equals(cuenta.getTipoMoneda())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean tieneCuentaEnMoneda(TipoMoneda moneda) {
+        for (Cuenta cuenta: cuentas) {
+            if (moneda.equals(cuenta.getTipoMoneda())) {
                 return true;
             }
         }

@@ -1,95 +1,90 @@
 package ar.edu.utn.frbb.tup.model;
 
+import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
-import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 
-import java.time.LocalDateTime;
-import java.util.Random;
+import java.time.LocalDate;
 
 public class Cuenta {
     private long numeroCuenta;
-    LocalDateTime fechaCreacion;
-    int balance;
-    TipoCuenta tipoCuenta;
-    Cliente titular;
-    TipoMoneda moneda;
+    private long dniTitular;
+    private LocalDate fechaCreacion;
+    private double balance;
+    private TipoCuenta tipoCuenta;
+    private TipoMoneda tipoMoneda;
+    private boolean estado;
 
+    //constructores
     public Cuenta() {
-        this.numeroCuenta = new Random().nextLong();
-        this.balance = 0;
-        this.fechaCreacion = LocalDateTime.now();
+
+    }
+    public Cuenta(long numeroCuenta, long dniTitular, LocalDate fechaCreacion, double balance, TipoCuenta tipoCuenta, TipoMoneda tipoMoneda, boolean estado) {
+        this.numeroCuenta = numeroCuenta;
+        this.dniTitular = dniTitular;
+        this.fechaCreacion = fechaCreacion;
+        this.balance = balance;
+        this.tipoCuenta = tipoCuenta;
+        this.tipoMoneda = tipoMoneda;
+        this.estado = estado;
     }
 
-    public Cliente getTitular() {
-        return titular;
+    public Cuenta(CuentaDto cuentaDto) {
+        dniTitular = cuentaDto.getDniTitular();
+        numeroCuenta = cuentaDto.getNumeroCuenta();
+        tipoCuenta = TipoCuenta.fromString(cuentaDto.getTipoCuenta());
+        tipoMoneda = TipoMoneda.fromString(cuentaDto.getTipoMoneda());
+        this.balance = cuentaDto.getBalance();
+        this.fechaCreacion = LocalDate.now();
+        estado = true;
     }
-
-    public void setTitular(Cliente titular) {
-        this.titular = titular;
+    //getters y setters
+    public long getDniTitular() {
+        return dniTitular;
     }
-
+    public void setDniTitular(long dniTitular) {
+        this.dniTitular = dniTitular;
+    }
 
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
     }
-
-    public Cuenta setTipoCuenta(TipoCuenta tipoCuenta) {
+    public void setTipoCuenta(TipoCuenta tipoCuenta) {
         this.tipoCuenta = tipoCuenta;
-        return this;
     }
 
-    public TipoMoneda getMoneda() {
-        return moneda;
+    public TipoMoneda getTipoMoneda() {
+        return tipoMoneda;
+    }
+    public void setTipoMoneda(TipoMoneda tipoMoneda) {
+        this.tipoMoneda = tipoMoneda;
     }
 
-    public Cuenta setMoneda(TipoMoneda moneda) {
-        this.moneda = moneda;
-        return this;
-    }
-
-
-    public LocalDateTime getFechaCreacion() {
+    public LocalDate getFechaCreacion() {
         return fechaCreacion;
     }
-
-    public Cuenta setFechaCreacion(LocalDateTime fechaCreacion) {
+    public void setFechaCreacion(LocalDate fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
-        return this;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
-
-    public Cuenta setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
-        return this;
-    }
-
-    public void debitarDeCuenta(int cantidadADebitar) throws NoAlcanzaException, CantidadNegativaException {
-        if (cantidadADebitar < 0) {
-            throw new CantidadNegativaException();
-        }
-
-        if (balance < cantidadADebitar) {
-            throw new NoAlcanzaException();
-        }
-        this.balance = this.balance - cantidadADebitar;
-    }
-
-    public void setNumeroCuenta(long numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
-    }
-
-    public void forzaDebitoDeCuenta(int i) {
-        this.balance = this.balance - i;
     }
 
     public long getNumeroCuenta() {
         return numeroCuenta;
     }
+    public void setNumeroCuenta(long numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+    }
 
-
+    public boolean isEstado() {
+        return estado;
+    }
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
 }

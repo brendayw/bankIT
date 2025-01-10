@@ -1,8 +1,8 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoMoneda {
-    PESOS("PESOS"),
-    DOLARES("DOLARES");
+    PESOS("P"),
+    DOLARES("D");
 
     private final String descripcion;
 
@@ -20,7 +20,7 @@ public enum TipoMoneda {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException("No se pudo encontrar un TipoPersona con la descripción: " + text);
+        throw new IllegalArgumentException("No se pudo encontrar un TipoMoneda con la descripción: " + text);
     }
 
 }

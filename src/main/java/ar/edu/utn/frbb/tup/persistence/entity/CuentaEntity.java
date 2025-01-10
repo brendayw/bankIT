@@ -2,79 +2,37 @@ package ar.edu.utn.frbb.tup.persistence.entity;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-public class CuentaEntity extends BaseEntity{
-    String nombre;
-    LocalDateTime fechaCreacion;
-    int balance;
-    String tipoCuenta;
-    Long titular;
-    long numeroCuenta;
+public class CuentaEntity extends BaseEntity {
+    private long titular; //dniTitular
+    private final String tipoCuenta;
+    private final String tipoMoneda;
+    private double balance;
+    private final LocalDate fechaCreacion;
+    private boolean estado;
 
     public CuentaEntity(Cuenta cuenta) {
         super(cuenta.getNumeroCuenta());
+        this.titular = cuenta.getDniTitular();
+        this.tipoCuenta = cuenta.getTipoCuenta() != null ? cuenta.getTipoCuenta().getDescripcion() : null;
+        this.tipoMoneda = cuenta.getTipoMoneda() != null ? cuenta.getTipoCuenta().getDescripcion() : null;
         this.balance = cuenta.getBalance();
-        this.tipoCuenta = cuenta.getTipoCuenta().toString();
-        this.titular = cuenta.getTitular().getDni();
         this.fechaCreacion = cuenta.getFechaCreacion();
+        this.estado = cuenta.isEstado();
     }
 
     public Cuenta toCuenta() {
         Cuenta cuenta = new Cuenta();
+        cuenta.setNumeroCuenta(cuenta.getNumeroCuenta());
+        cuenta.setDniTitular(this.titular);
+        cuenta.setTipoCuenta(TipoCuenta.fromString(this.tipoCuenta));
+        cuenta.setTipoMoneda(TipoMoneda.fromString(this.tipoMoneda));
         cuenta.setBalance(this.balance);
-        cuenta.setNumeroCuenta(this.numeroCuenta);
-        cuenta.setTipoCuenta(TipoCuenta.valueOf(this.tipoCuenta));
         cuenta.setFechaCreacion(this.fechaCreacion);
+        cuenta.setEstado(true);
         return cuenta;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public int getBalance() {
-        return balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    public String getTipoCuenta() {
-        return tipoCuenta;
-    }
-
-    public void setTipoCuenta(String tipoCuenta) {
-        this.tipoCuenta = tipoCuenta;
-    }
-
-    public Long getTitular() {
-        return titular;
-    }
-
-    public void setTitular(Long titular) {
-        this.titular = titular;
-    }
-
-    public long getNumeroCuenta() {
-        return numeroCuenta;
-    }
-
-    public void setNumeroCuenta(long numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
     }
 }

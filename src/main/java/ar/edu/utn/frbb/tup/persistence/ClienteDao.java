@@ -2,9 +2,8 @@ package ar.edu.utn.frbb.tup.persistence;
 
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.exception.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
-import ch.qos.logback.core.net.server.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,18 +13,22 @@ public class ClienteDao extends AbstractBaseDao {
     @Autowired
     CuentaDao cuentaDao;
 
+    @Override
+    protected String getEntityName() {
+        return "CLIENTE";
+    }
+
     public Cliente find(long dni, boolean loadComplete) {
         if (getInMemoryDatabase().get(dni) == null)
             return null;
-        Cliente cliente =   ((ClienteEntity) getInMemoryDatabase().get(dni)).toCliente();
+        Cliente cliente = ((ClienteEntity) getInMemoryDatabase().get(dni)).toCliente();
         if (loadComplete) {
             for (Cuenta cuenta :
-                    cuentaDao.getCuentasByCliente(dni)) {
+                    cuentaDao.buscarCuentasByCliente(dni)) {
                 cliente.addCuenta(cuenta);
             }
         }
         return cliente;
-
     }
 
     public void save(Cliente cliente) {
@@ -49,10 +52,5 @@ public class ClienteDao extends AbstractBaseDao {
             throw new ClientNoExisteException("Cliente no encontrado.");
         }
         return actualizado;
-    }
-
-    @Override
-    protected String getEntityName() {
-        return "CLIENTE";
     }
 }

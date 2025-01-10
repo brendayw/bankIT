@@ -5,16 +5,18 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Prestamo;
-import ar.edu.utn.frbb.tup.model.exception.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
+import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ClienteService {
 
     ClienteDao clienteDao;
+    CuentaDao cuentaDao;
     PrestamoService prestamoService;
 
     public ClienteService(ClienteDao clienteDao) {
@@ -35,11 +37,11 @@ public class ClienteService {
     }
 
     //agrega una cuenta
-    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException, ClientNoExisteException {
+    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente titular = buscarClientePorDni(dniTitular);
-        cuenta.setTitular(titular);
-        if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
-            throw new TipoCuentaAlreadyExistsException("El cliente ya posee una cuenta de ese tipo y moneda");
+        cuenta.setDniTitular(dniTitular);
+        if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getTipoMoneda())) {
+            throw new TipoCuentaYaExisteException("El cliente ya posee una cuenta de ese tipo y moneda");
         }
         titular.addCuenta(cuenta);
         clienteDao.save(titular);

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteEntity extends BaseEntity {
-
     private final String tipoPersona;
     private final String nombre;
     private final String apellido;

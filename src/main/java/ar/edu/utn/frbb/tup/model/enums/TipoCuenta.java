@@ -1,8 +1,8 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum TipoCuenta {
-    CUENTA_CORRIENTE("CC"),
-    CAJA_AHORRO("CA");
+    CUENTA_CORRIENTE("C"),
+    CAJA_AHORRO("A");
 
     private final String descripcion;
 
@@ -23,3 +23,4 @@ public enum TipoCuenta {
         throw new IllegalArgumentException("No se pudo encontrar un TipoCuenta con la descripción: " + text);
     }
 }
+

@@ -6,9 +6,9 @@ import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
-import ar.edu.utn.frbb.tup.model.exception.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,7 @@ public class ClienteServiceTest {
 
 
     @Test
-    public void testAgregarCuentaAClienteSuccess() throws TipoCuentaAlreadyExistsException, ClientNoExisteException {
+    public void testAgregarCuentaAClienteSuccess() throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente pepeRino = new Cliente();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -87,8 +87,8 @@ public class ClienteServiceTest {
         pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
         Cuenta cuenta = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
+                .setTipoMoneda(TipoMoneda.PESOS)
+                .setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
         when(clienteDao.find(26456439, true)).thenReturn(pepeRino);
@@ -98,13 +98,13 @@ public class ClienteServiceTest {
         verify(clienteDao, times(1)).save(pepeRino);
 
         assertEquals(1, pepeRino.getCuentas().size());
-        assertEquals(pepeRino, cuenta.getTitular());
+        assertEquals(pepeRino, cuenta.getDniTitular());
 
     }
 
 
     @Test
-    public void testAgregarCuentaAClienteDuplicada() throws TipoCuentaAlreadyExistsException, ClientNoExisteException {
+    public void testAgregarCuentaAClienteDuplicada() throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente luciano = new Cliente();
         luciano.setDni(26456439);
         luciano.setNombre("Pepe");
@@ -113,8 +113,8 @@ public class ClienteServiceTest {
         luciano.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
         Cuenta cuenta = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
+                .setTipoMoneda(TipoMoneda.PESOS)
+                .setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
         when(clienteDao.find(26456439, true)).thenReturn(luciano);
@@ -122,14 +122,14 @@ public class ClienteServiceTest {
         clienteService.agregarCuenta(cuenta, luciano.getDni());
 
         Cuenta cuenta2 = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
+                .setTipoMoneda(TipoMoneda.PESOS)
+                .setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        assertThrows(TipoCuentaAlreadyExistsException.class, () -> clienteService.agregarCuenta(cuenta2, luciano.getDni()));
+        assertThrows(TipoCuentaYaExisteException.class, () -> clienteService.agregarCuenta(cuenta2, luciano.getDni()));
         verify(clienteDao, times(1)).save(luciano);
         assertEquals(1, luciano.getCuentas().size());
-        assertEquals(luciano, cuenta.getTitular());
+        assertEquals(luciano, cuenta.getDniTitular());
 
     }
 
