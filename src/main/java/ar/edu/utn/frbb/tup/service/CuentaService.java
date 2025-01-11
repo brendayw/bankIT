@@ -29,6 +29,11 @@ public class CuentaService {
 
     public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException {
         Cuenta cuenta = new Cuenta(cuentaDto);
+        long numeroCuenta = cuenta.getNumeroCuenta();
+        while (cuentaDao.find(numeroCuenta) != null) {
+            numeroCuenta = cuenta.getNumeroCuenta();
+        }
+        cuenta.setNumeroCuenta(numeroCuenta);
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaYaExisteException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }

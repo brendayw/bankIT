@@ -1,7 +1,7 @@
 package ar.edu.utn.frbb.tup.controller.dto;
 
 public class CuentaDto {
-    private long numeroCuenta;
+    private long numeroCuenta; //GENERADO CON RANDOM
     private long dniTitular;
     private String tipoMoneda;
     private String tipoCuenta;

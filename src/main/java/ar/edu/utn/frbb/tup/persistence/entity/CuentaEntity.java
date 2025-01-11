@@ -7,6 +7,7 @@ import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import java.time.LocalDate;
 
 public class CuentaEntity extends BaseEntity {
+    private long numeroCuenta;
     private long titular; //dniTitular
     private final String tipoCuenta;
     private final String tipoMoneda;
@@ -16,9 +17,10 @@ public class CuentaEntity extends BaseEntity {
 
     public CuentaEntity(Cuenta cuenta) {
         super(cuenta.getNumeroCuenta());
+        this.numeroCuenta = cuenta.getNumeroCuenta();
         this.titular = cuenta.getDniTitular();
         this.tipoCuenta = cuenta.getTipoCuenta() != null ? cuenta.getTipoCuenta().getDescripcion() : null;
-        this.tipoMoneda = cuenta.getTipoMoneda() != null ? cuenta.getTipoCuenta().getDescripcion() : null;
+        this.tipoMoneda = cuenta.getTipoMoneda() != null ? cuenta.getTipoMoneda().getDescripcion() : null;
         this.balance = cuenta.getBalance();
         this.fechaCreacion = cuenta.getFechaCreacion();
         this.estado = cuenta.isEstado();
@@ -26,7 +28,7 @@ public class CuentaEntity extends BaseEntity {
 
     public Cuenta toCuenta() {
         Cuenta cuenta = new Cuenta();
-        cuenta.setNumeroCuenta(cuenta.getNumeroCuenta());
+        cuenta.setNumeroCuenta(this.numeroCuenta);
         cuenta.setDniTitular(this.titular);
         cuenta.setTipoCuenta(TipoCuenta.fromString(this.tipoCuenta));
         cuenta.setTipoMoneda(TipoMoneda.fromString(this.tipoMoneda));

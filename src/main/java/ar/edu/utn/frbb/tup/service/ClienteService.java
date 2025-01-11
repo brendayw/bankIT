@@ -38,12 +38,14 @@ public class ClienteService {
 
     //agrega una cuenta
     public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException {
-        Cliente titular = buscarClientePorDni(dniTitular);
-        cuenta.setDniTitular(dniTitular);
+        Cliente titular = clienteDao.find(dniTitular, true);
+        //cuenta.setDniTitular(dniTitular);
+        if (titular == null) {
+            throw new ClientNoExisteException("El cliente con DNI: " + dniTitular + " no existe.");      }
         if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getTipoMoneda())) {
             throw new TipoCuentaYaExisteException("El cliente ya posee una cuenta de ese tipo y moneda");
         }
-        titular.addCuenta(cuenta);
+        titular.getCuentas().add(cuenta);
         clienteDao.save(titular);
     }
 

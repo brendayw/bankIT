@@ -5,6 +5,9 @@ import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public class Cuenta {
     private long numeroCuenta;
@@ -17,7 +20,7 @@ public class Cuenta {
 
     //constructores
     public Cuenta() {
-
+        this.numeroCuenta = new Random().nextLong();
     }
     public Cuenta(long numeroCuenta, long dniTitular, LocalDate fechaCreacion, double balance, TipoCuenta tipoCuenta, TipoMoneda tipoMoneda, boolean estado) {
         this.numeroCuenta = numeroCuenta;
@@ -31,7 +34,7 @@ public class Cuenta {
 
     public Cuenta(CuentaDto cuentaDto) {
         dniTitular = cuentaDto.getDniTitular();
-        numeroCuenta = cuentaDto.getNumeroCuenta();
+        numeroCuenta = Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
         tipoCuenta = TipoCuenta.fromString(cuentaDto.getTipoCuenta());
         tipoMoneda = TipoMoneda.fromString(cuentaDto.getTipoMoneda());
         this.balance = cuentaDto.getBalance();
@@ -39,6 +42,13 @@ public class Cuenta {
         estado = true;
     }
     //getters y setters
+    public long getNumeroCuenta() {
+        return numeroCuenta;
+    }
+    public void setNumeroCuenta(long numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+    }
+
     public long getDniTitular() {
         return dniTitular;
     }
@@ -74,17 +84,11 @@ public class Cuenta {
         this.balance = balance;
     }
 
-    public long getNumeroCuenta() {
-        return numeroCuenta;
-    }
-    public void setNumeroCuenta(long numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
-    }
-
     public boolean isEstado() {
         return estado;
     }
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
+
 }
