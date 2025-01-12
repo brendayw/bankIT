@@ -1,20 +1,12 @@
 package ar.edu.utn.frbb.tup.controller.dto;
 
 public class PrestamoDto {
-    private long id; //generado con random
     private long dniTitular;
     private double montoPrestamo;
     private String tipoMoneda;
     private int plazoMeses;
 
     //getters y setters
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public long getDniTitular() {
         return dniTitular;
     }
@@ -42,4 +34,5 @@ public class PrestamoDto {
     public void setTipoMoneda(String tipoMoneda) {
         this.tipoMoneda = tipoMoneda;
     }
+
 }

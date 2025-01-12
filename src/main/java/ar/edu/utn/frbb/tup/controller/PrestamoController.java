@@ -5,6 +5,8 @@ import ar.edu.utn.frbb.tup.controller.validator.PrestamoValidator;
 import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoMonedaNoSoportada;
+import ar.edu.utn.frbb.tup.model.exception.prestamo.CreditScoreException;
+import ar.edu.utn.frbb.tup.model.exception.prestamo.PrestamoNoExisteException;
 import ar.edu.utn.frbb.tup.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +23,7 @@ public class PrestamoController {
     private PrestamoValidator prestamoValidator;
 
     @PostMapping
-    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException , TipoMonedaNoSoportada{
+    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException , TipoMonedaNoSoportada, CreditScoreException, PrestamoNoExisteException {
         prestamoValidator.validate(prestamoDto);
         return prestamoService.darAltaPrestamo(prestamoDto);
     }
@@ -41,7 +43,7 @@ public class PrestamoController {
     //actualizar
     @PutMapping("/{id}")
     public Prestamo actualizarPrestamo(@PathVariable long id, @RequestBody Prestamo prestamoActualizado) {
-        Prestamo prestamo = prestamoService.actualizarDatosPrestamo(id, prestamoActualizado.getMonto(), prestamoActualizado.getLoanStatus(), prestamoActualizado.getCuotasPagadas(), prestamoActualizado.getCuotasRestantes());
+        Prestamo prestamo = prestamoService.actualizarDatosPrestamo(id, prestamoActualizado.getMonto(), prestamoActualizado.getLoanStatus());
         return prestamo;
     }
 

@@ -1,29 +1,38 @@
 package ar.edu.utn.frbb.tup.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PlanPago {
-    private int cuotaNum;
+    private int cuotaNro;
     private double monto;
 
-    //constructor
-    public PlanPago(int cuotaNum, double monto) {
-        this.cuotaNum = cuotaNum;
+    // Constructor
+    public PlanPago(int cuotaNro, double monto) {
+        this.cuotaNro = cuotaNro;
         this.monto = monto;
     }
 
-    //getters y setters
-    public int getCuotaNum() {
-        return cuotaNum;
+    // Getters y setters
+    public int getCuotaNro() {
+        return cuotaNro;
     }
-
-    public void setCuotaNum(int cuotaNum) {
-        this.cuotaNum = cuotaNum;
+    public void setCuotaNro(int cuotaNro) {
+        this.cuotaNro = cuotaNro;
     }
 
     public double getMonto() {
         return monto;
     }
-
     public void setMonto(double monto) {
         this.monto = monto;
+    }
+
+    //metodos
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("cuotaNro", cuotaNro);
+        map.put("monto", monto);
+        return map;
     }
 }

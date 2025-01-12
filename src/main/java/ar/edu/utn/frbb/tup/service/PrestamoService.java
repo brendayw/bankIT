@@ -4,65 +4,62 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.exception.prestamo.CreditScoreException;
+import ar.edu.utn.frbb.tup.model.exception.prestamo.PrestamoNoExisteException;
 import ar.edu.utn.frbb.tup.persistence.PrestamoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PrestamoService {
     PrestamoDao prestamoDao;
     @Autowired ClienteService clienteService;
+    @Autowired CuentaService cuentaService;
     @Autowired CreditScoreService creditScoreService;
 
     public PrestamoService(PrestamoDao prestamoDao) {
         this.prestamoDao = prestamoDao;
     }
 
-    //para calcular el interes
-
     //solicitar prestamo
-    public Prestamo darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException {
-        Prestamo prestamo = new Prestamo(prestamoDto);
+    public Prestamo darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CreditScoreException, PrestamoNoExisteException {
+        System.out.println("Solicitando préstamo para el cliente con DNI: " + prestamoDto.getDniTitular());
+
+        Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getDniTitular());
+        if (cliente == null || !cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
+            throw new IllegalArgumentException("El cliente no tiene una cuenta en la moneda solicitada.");
+        }
+
+        creditScoreService.validarScore(cliente);
+        int score = creditScoreService.calcularScore(cliente.getPrestamos());
+        System.out.println("Puntaje calculado para el préstamo: " + score);
+
+        Prestamo prestamo = new Prestamo(prestamoDto, score);
+        System.out.println("Préstamo creado con ID: " + prestamo.getId());
+
         long id = prestamo.getId();
         while (prestamoDao.findPrestamo(id) != null) {
             id = prestamo.getId();
         }
         prestamo.setId(id);
+
         if (prestamoDao.findPrestamo(prestamo.getId()) != null) {
-           throw new IllegalArgumentException("Prestamo no encontrado");
+           throw new PrestamoNoExisteException("Prestamo no encontrado");
         }
-        Cliente cliente = clienteService.buscarClientePorDni(prestamo.getDniTitular());
-        creditScoreService.validarScore(cliente);
         double montoConInteres = calcularInteres(prestamoDto);
-        double cuotaMensual = calcularCuotaMensual(montoConInteres, prestamo.getPlazoMeses());
-        prestamo.setmontoConInteres(montoConInteres);
-        prestamo.setCuotaMensual(cuotaMensual);
+        //double cuotaMensual = calcularCuotaMensual(montoConInteres, prestamo.getPlazoMeses());
+        prestamo.setMontoConInteres(montoConInteres);
+//        prestamo.setCuotaMensual(cuotaMensual);
+
         clienteService.agregarPrestamo(prestamo, prestamo.getDniTitular());
         prestamoDao.savePrestamo(prestamo);
+
         return prestamo;
-    }
-
-    public double calcularInteres(PrestamoDto prestamoDto) {
-        Prestamo prestamo = new Prestamo(prestamoDto);
-        if (prestamo == null || prestamo.getMonto() <= 0 || prestamo.getPlazoMeses() <= 0) {
-            new IllegalArgumentException("El monto y plazo del prestamo deben ser mayores a cero.");
-        }
-        double monto = prestamo.getMonto();
-        int plazoMeses = prestamo.getPlazoMeses();
-        double tiempo = plazoMeses / 12.0;
-        double interes = monto * 0.40 * tiempo; //0.40 es la tasa de interes anual
-        double montoConInteres = monto + interes;
-        return montoConInteres;
-    }
-
-    private double calcularCuotaMensual(double montoTotal, int plazoMeses) {
-        return montoTotal / plazoMeses;
     }
 
     //busca prestamo por id de prestamo
@@ -88,7 +85,7 @@ public class PrestamoService {
     }
 
     //actualizar datos
-    public Prestamo actualizarDatosPrestamo(long id, double monto, LoanStatus estado, int nuevaCuotasPagada, int nuevaCuotasRestantes) {
+    public Prestamo actualizarDatosPrestamo(long id, double monto, LoanStatus estado /*int nuevaCuotasPagada, int nuevaCuotasRestantes*/) {
         Prestamo prestamo = prestamoDao.findPrestamo(id);
         if (prestamo == null) {
             throw new IllegalArgumentException("El prestamo con ID: " + id + " no existe.");
@@ -96,29 +93,15 @@ public class PrestamoService {
         if (monto != 0) {
             throw new IllegalArgumentException("Esa accion no esta permtida");
         }
-        if (nuevaCuotasPagada != 0) {
-            prestamo.setCuotasPagadas(nuevaCuotasPagada);
-        }
-        if (nuevaCuotasRestantes !=0) {
-            prestamo.setCuotasRestantes(nuevaCuotasRestantes);
-        }
         if (estado != null) {
-            switch (estado) {
-                case APROBADO:
-                    prestamo.setLoanStatus(LoanStatus.APROBADO);
-                    prestamo.setAprovacionFecha(LocalDate.now());
-                    break;
-                case RECHAZADO:
-                    prestamo.setLoanStatus(LoanStatus.RECHAZADO);
-                    break;
-                case DESEMBOLSADO:
-                    prestamo.setLoanStatus(LoanStatus.DESEMBOLSADO);
-                    break;
-                default:
-                    prestamo.setLoanStatus(LoanStatus.PENDIENTE);
-                    break;
-            }
+            prestamo.setLoanStatus(estado);
         }
+//        if (nuevaCuotasPagada != 0) {
+//            prestamo.setCuotasPagadas(nuevaCuotasPagada);
+//        }
+//        if (nuevaCuotasRestantes !=0) {
+//            prestamo.setCuotasRestantes(nuevaCuotasRestantes);
+//        }
         prestamoDao.update(prestamo);
         return prestamo;
     }
@@ -130,8 +113,28 @@ public class PrestamoService {
             throw new IllegalArgumentException("El prestamo con ID: " + id + " no existe.");
         }
         prestamo.setLoanStatus(LoanStatus.CERRADO);
-        actualizarDatosPrestamo(id, 0, LoanStatus.CERRADO, 0, 0);
+        actualizarDatosPrestamo(id, 0, LoanStatus.CERRADO /*, 0, 0*/);
         return prestamo;
     }
+
+    //otros metodos
+    public double calcularInteres(PrestamoDto prestamoDto) {
+        int score = 600;
+        Prestamo prestamo = new Prestamo(prestamoDto, score);
+        if (prestamo == null || prestamo.getMonto() <= 0 || prestamo.getPlazoMeses() <= 0) {
+            new IllegalArgumentException("El monto y plazo del prestamo deben ser mayores a cero.");
+        }
+        double monto = prestamo.getMonto();
+        int plazoMeses = prestamo.getPlazoMeses();
+        double tiempo = plazoMeses / 12.0;
+        double interes = monto * 0.40 * tiempo; //0.40 es la tasa de interes anual
+        double montoConInteres = monto + interes;
+        return montoConInteres;
+    }
+
+//    private double calcularCuotaMensual(double montoTotal, int plazoMeses) {
+//        return montoTotal / plazoMeses;
+//    }
+
 
 }

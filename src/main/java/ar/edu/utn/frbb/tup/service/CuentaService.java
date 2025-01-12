@@ -103,6 +103,14 @@ public class CuentaService {
         return cuenta;
     }
 
+    //actualizar balance de cuenta
+//    public double actualizarBalanceCuenta(Cuenta cuenta, double montoPrestamo) {
+//        double balanceActual = cuenta.getBalance();
+//        double nuevoBalance = balanceActual + montoPrestamo;
+//        cuenta.setBalance(nuevoBalance);
+//        return nuevoBalance;
+//    }
+
     //delete
     public Cuenta desactivarCuenta(long id) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);

@@ -45,12 +45,12 @@ public class PrestamoDao extends AbstractBaseDao {
     public Prestamo update(Prestamo prestamo) {
         Prestamo actualizado = findPrestamo(prestamo.getId());
         if (actualizado != null) {
-            if (prestamo.getCuotasPagadas() != 0) {
-                actualizado.setCuotasPagadas(prestamo.getCuotasPagadas());
-            }
-            if (prestamo.getCuotasRestantes() != 0) {
-                actualizado.setCuotasRestantes(prestamo.getCuotasRestantes());
-            }
+//            if (prestamo.getCuotasPagadas() != 0) {
+//                actualizado.setCuotasPagadas(prestamo.getCuotasPagadas());
+//            }
+//            if (prestamo.getCuotasRestantes() != 0) {
+//                actualizado.setCuotasRestantes(prestamo.getCuotasRestantes());
+//            }
             System.out.println("Datos actualizados.");
         } else {
             throw new IllegalArgumentException("Prestamo no encontrado.");

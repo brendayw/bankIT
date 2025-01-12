@@ -5,6 +5,8 @@ import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Prestamo {
@@ -14,20 +16,24 @@ public class Prestamo {
     private double montoConInteres;
     private int plazoMeses;
     private TipoMoneda moneda;
-
     private LocalDate solicitudFecha;
     private LocalDate aprovacionFecha;
     private LoanStatus loanStatus;
-
-    private double cuotaMensual;
-    private int cuotasPagadas;
-    private int cuotasRestantes;
+    private String mensaje;
+    //private double cuotaMensual;
+    //private int cuotasPagadas;
+    //private int cuotasRestantes;
+    private List<PlanPago> planDePagos;
+//    private String mensaje;
 
     //constructores
     public Prestamo() {
         this.id = new Random().nextLong();
     }
-    public Prestamo(long id, long dniTitular, double monto, double montoConInteres, int plazoMeses, TipoMoneda moneda, LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, double cuotaMensual, int cuotasPagadas, int cuotasRestantes) {
+
+    public Prestamo(long id, long dniTitular, double monto, double montoConInteres, int plazoMeses, TipoMoneda moneda,
+                    LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, String mensaje, double cuotaMensual,
+                    int cuotasPagadas, int cuotasRestantes, List<PlanPago> planDePagos) {
         this.id = id;
         this.dniTitular = dniTitular;
         this.monto = monto;
@@ -37,19 +43,27 @@ public class Prestamo {
         this.solicitudFecha = solicitudFecha;
         this.aprovacionFecha = aprovacionFecha;
         this.loanStatus = loanStatus;
-        this.cuotaMensual = cuotaMensual;
-        this.cuotasPagadas = cuotasPagadas;
-        this.cuotasRestantes = cuotasRestantes;
+        this.mensaje = mensaje;
+        //this.cuotaMensual = cuotaMensual;
+        //this.cuotasPagadas = cuotasPagadas;
+        //this.cuotasRestantes = cuotasRestantes;
+        this.planDePagos = new ArrayList<>();
     }
 
-    public Prestamo(PrestamoDto prestamoDto) {
+    public Prestamo(PrestamoDto prestamoDto, int score) {
         id = Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
         dniTitular = prestamoDto.getDniTitular();
         monto = prestamoDto.getMontoPrestamo();
         moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
         plazoMeses = prestamoDto.getPlazoMeses();
         this.solicitudFecha = LocalDate.now();
-        loanStatus = LoanStatus.PENDIENTE;
+        if (score >= 700) {
+            this.loanStatus = LoanStatus.APROBADO;
+        } else {
+            this.loanStatus = LoanStatus.RECHAZADO;
+        }
+        mensaje = devolverMensaje(this.loanStatus);
+        planDePagos = calcularPlanPagos();
     }
 
     // getters & setters
@@ -74,10 +88,10 @@ public class Prestamo {
         this.monto = monto;
     }
 
-    public double getmontoConInteres() {
+    public double getMontoConInteres() {
         return montoConInteres;
     }
-    public void setmontoConInteres(double montoConInteres) {
+    public void setMontoConInteres(double montoConInteres) {
         this.montoConInteres = montoConInteres;
     }
 
@@ -107,6 +121,7 @@ public class Prestamo {
     }
     public void setLoanStatus(LoanStatus loanStatus) {
         this.loanStatus = loanStatus;
+        this.mensaje = devolverMensaje(loanStatus);
     }
 
     public TipoMoneda getMoneda() {
@@ -116,25 +131,64 @@ public class Prestamo {
         this.moneda = moneda;
     }
 
-    public double getCuotaMensual() {
-        return cuotaMensual;
-    }
-    public void setCuotaMensual(double cuotaMensual) {
-        this.cuotaMensual = cuotaMensual;
+    //otros metodos
+    public String devolverMensaje(LoanStatus estado) {
+        switch (estado) {
+            case APROBADO:
+                mensaje = "El préstamo fue aprobado, pronto será desembolsado.";
+                break;
+            case RECHAZADO:
+                mensaje = "El préstamo ha sido rechazado debido a una calificación crediticia insuficiente";
+                break;
+            default:
+                mensaje = "Estado desconocido del préstamo";
+                break;
+        }
+        return mensaje;
     }
 
-    public int getCuotasPagadas() {
-        return cuotasPagadas;
-    }
-    public void setCuotasPagadas(int cuotasPagadas) {
-        this.cuotasPagadas = cuotasPagadas;
+    public List<PlanPago> calcularPlanPagos() {
+        List<PlanPago> cuotas = new ArrayList<>();
+        double montoCuota = this.monto / this.plazoMeses;
+        for (int i = 1; i <= this.plazoMeses; i++) {
+            cuotas.add(new PlanPago(i, montoCuota));
+        }
+        return cuotas;
     }
 
-    public int getCuotasRestantes() {
-        return cuotasRestantes;
+//    public double getCuotaMensual() {
+//        return cuotaMensual;
+//    }
+//    public void setCuotaMensual(double cuotaMensual) {
+//        this.cuotaMensual = cuotaMensual;
+//    }
+//
+//    public int getCuotasPagadas() {
+//        return cuotasPagadas;
+//    }
+//    public void setCuotasPagadas(int cuotasPagadas) {
+//        this.cuotasPagadas = cuotasPagadas;
+//    }
+//
+//    public int getCuotasRestantes() {
+//        return cuotasRestantes;
+//    }
+//    public void setCuotasRestantes(int cuotasRestantes) {
+//        this.cuotasRestantes = cuotasRestantes;
+//    }
+
+    public List<PlanPago> getPlanDePagos() {
+        return planDePagos;
     }
-    public void setCuotasRestantes(int cuotasRestantes) {
-        this.cuotasRestantes = cuotasRestantes;
+    public void setPlanDePagos(List<PlanPago> planDePagos) {
+        this.planDePagos = planDePagos;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 
     @Override
@@ -148,9 +202,9 @@ public class Prestamo {
                 "\nPlazo en meses: " + plazoMeses +
                 "\nFecha de solicitud: " + solicitudFecha +
                 "\nFecha de aprovacion: " + aprovacionFecha +
-                "\nEstado: " + loanStatus +
-                "\nMonto cuota mensual: " + cuotaMensual +
-                "\nCuotas pagadas: " + cuotasPagadas +
-                "\nCuotas restantes: " + cuotasRestantes;
+                "\nEstado: " + loanStatus;
+//                "\nMonto cuota mensual: " + cuotaMensual +
+//                "\nCuotas pagadas: " + cuotasPagadas +
+//                "\nCuotas restantes: " + cuotasRestantes;
     }
 }

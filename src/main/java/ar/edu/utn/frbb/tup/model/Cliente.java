@@ -16,7 +16,6 @@ public class Cliente extends Persona{
     private LocalDate fechaAlta;
     private Set<Cuenta> cuentas = new HashSet<>();
     private Set<Prestamo> prestamos = new HashSet<>();
-    private int score;
     private boolean activo;
 
     //constructores
@@ -28,7 +27,6 @@ public class Cliente extends Persona{
         tipoPersona = TipoPersona.fromString(clienteDto.getTipoPersona());
         fechaAlta = LocalDate.now();
         banco = clienteDto.getBanco();
-        score = clienteDto.getScore();
         activo = true;
     }
 
@@ -69,21 +67,6 @@ public class Cliente extends Persona{
     }
 
     //metodos
-    public int getScore() {
-        if (prestamos.isEmpty()) {
-            return 700;
-        }
-        score = 700; //verificar esto
-        for (Prestamo prestamo : prestamos) {
-            if (prestamo.getLoanStatus().equals(LoanStatus.APROBADO)) {
-                score += 10;
-            } else if (prestamo.getLoanStatus().equals(LoanStatus.RECHAZADO)) {
-                score -= 20;
-            }
-        }
-        return Math.max(300, Math.min(score, 850));
-    }
-
     public void addCuenta(Cuenta cuenta) {
         this.cuentas.add(cuenta);
         cuenta.setDniTitular(cuenta.getDniTitular());
