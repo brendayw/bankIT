@@ -1,108 +1,53 @@
 package ar.edu.utn.frbb.tup.persistence.entity;
 
-import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
-
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class PrestamoEntity extends BaseEntity {
-    long numeroCliente;
-    double monto;
-    double cuotaMensual;
-    int plazoMeses;
-    int cuotasPagadas;
-    int cuotasRestantes;
-    LocalDateTime solicitudFecha;
-    String aprobacionFecha;
-    LoanStatus estado;
+    private final long id;
+    private final long dniTitular;
+    private final double monto;
+    private final String tipoMoneda;
+    private final double cuotaMensual;
+    private final int plazoMeses;
+    private final int cuotasPagadas;
+    private final int cuotasRestantes;
+    private final LocalDate solicitudFecha;
+    private final LocalDate aprobacionFecha;
+    private String estado;
 
     public PrestamoEntity(Prestamo prestamo) {
-        super(prestamo.getId_loan());
-        this.numeroCliente = prestamo.getNumeroCliente().getDni();
-        this.monto = prestamo.getAmount();
+        super(prestamo.getId());
+        this.id = prestamo.getId();
+        this.dniTitular = prestamo.getDniTitular();
+        this.monto = prestamo.getMonto();
+        this.tipoMoneda = prestamo.getMoneda() != null ? prestamo.getMoneda().getDescripcion() : null;
         this.cuotaMensual = prestamo.getCuotaMensual();
-        this.plazoMeses = prestamo.getTermMonths();
+        this.plazoMeses = prestamo.getPlazoMeses();
         this.cuotasPagadas = prestamo.getCuotasPagadas();
         this.cuotasRestantes = prestamo.getCuotasRestantes();
-        this.aprobacionFecha = prestamo.getApprovalDate();
-        this.estado = prestamo.getLoanStatus();
+        this.solicitudFecha = prestamo.getSolicitudFecha();
+        this.aprobacionFecha = prestamo.getAprovacionFecha();
+        this.estado = prestamo.getLoanStatus() != null ? prestamo.getLoanStatus().getDescripcion() : null;
     }
 
     public Prestamo toPrestamo() {
         Prestamo prestamo = new Prestamo();
-        prestamo.setAmount(this.monto);
+        prestamo.setId(this.id);
+        prestamo.setDniTitular(this.dniTitular);
+        prestamo.setMonto(this.monto);
+        prestamo.setMoneda(TipoMoneda.fromString(this.tipoMoneda));
         prestamo.setCuotaMensual(this.cuotaMensual);
-        prestamo.setTermMonths(this.plazoMeses);
+        prestamo.setPlazoMeses(this.plazoMeses);
         prestamo.setCuotasPagadas(this.cuotasPagadas);
         prestamo.setCuotasRestantes(this.cuotasRestantes);
-        prestamo.setApprovalDate(this.aprobacionFecha);
-        prestamo.setLoanStatus(this.estado);
+        prestamo.setSolicitudFecha(this.solicitudFecha);
+        prestamo.setAprovacionFecha(this.aprobacionFecha);
+        prestamo.setLoanStatus(LoanStatus.fromString(this.estado));
         return prestamo;
     }
 
-    //getters y setters
-    public long getNumeroCliente() {
-        return numeroCliente;
-    }
-    public void setNumeroCliente(long numeroCliente) {
-        this.numeroCliente = numeroCliente;
-    }
-
-    public double getMonto() {
-        return monto;
-    }
-    public void setMonto(double monto) {
-        this.monto = monto;
-    }
-
-    public double getCuotaMensual() {
-        return cuotaMensual;
-    }
-    public void setCuotaMensual(double cuotaMensual) {
-        this.cuotaMensual = cuotaMensual;
-    }
-
-    public int getPlazoMeses() {
-        return plazoMeses;
-    }
-    public void setPlazoMeses(int plazoMeses) {
-        this.plazoMeses = plazoMeses;
-    }
-
-    public int getCuotasPagadas() {
-        return cuotasPagadas;
-    }
-    public void setCuotasPagadas(int cuotasPagadas) {
-        this.cuotasPagadas = cuotasPagadas;
-    }
-
-    public int getCuotasRestantes() {
-        return cuotasRestantes;
-    }
-    public void setCuotasRestantes(int cuotasRestantes) {
-        this.cuotasRestantes = cuotasRestantes;
-    }
-
-    public LocalDateTime getSolicitudFecha() {
-        return solicitudFecha;
-    }
-    public void setSolicitudFecha(LocalDateTime solicitudFecha) {
-        this.solicitudFecha = solicitudFecha;
-    }
-
-    public String getAprobacionFecha() {
-        return aprobacionFecha;
-    }
-    public void setAprobacionFecha(String aprobacionFecha) {
-        this.aprobacionFecha = aprobacionFecha;
-    }
-
-    public LoanStatus getEstado() {
-        return estado;
-    }
-    public void setEstado(LoanStatus estado) {
-        this.estado = estado;
-    }
 }

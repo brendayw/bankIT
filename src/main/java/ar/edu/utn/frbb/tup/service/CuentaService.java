@@ -1,15 +1,21 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaYaExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CuentaService {
@@ -61,11 +67,50 @@ public class CuentaService {
 //        return tipoMonedaSoportada;
 //    }
 
-    public Cuenta buscarCuentaPorId(long id) {
+    public Cuenta buscarCuentaPorId(long id) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);
         if (cuenta == null) {
-            throw new IllegalArgumentException("La cuenta no existe.");
+            throw new CuentaNoExisteException("La cuenta no existe.");
         }
+        return cuenta;
+    }
+
+    public List<Cuenta> buscarCuentaPorCliente(long dni) throws ClientNoExisteException, CuentaNoExisteException {
+        Cliente cliente = clienteService.buscarClientePorDni(dni);
+        if (cliente == null) {
+            throw  new ClientNoExisteException("El cliente con DNI: " + dni + " no existe.");
+        }
+        Set<Cuenta> cuentas = cliente.getCuentas();
+        if (cuentas == null || cuentas.isEmpty()) {
+            throw new CuentaNoExisteException("El cliente con DNI: " + dni + " no tiene cuentas asociadas.");
+        }
+        return new ArrayList<>(cuentas);
+    }
+
+    //actualiza balance y estado
+    public Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException {
+        Cuenta cuenta = cuentaDao.find(id);
+        if (cuenta == null) {
+            throw new CuentaNoExisteException("La cuenta con ID: " + id + " no existe.");
+        }
+        if (nuevoBalance != 0.0) {
+            cuenta.setBalance(nuevoBalance);
+        }
+        if (estado == null) {
+            cuenta.setEstado(true);
+        }
+        cuentaDao.update(cuenta);
+        return cuenta;
+    }
+
+    //delete
+    public Cuenta desactivarCuenta(long id) throws CuentaNoExisteException {
+        Cuenta cuenta = cuentaDao.find(id);
+        if (cuenta == null) {
+            throw new CuentaNoExisteException("La cuenta con ID: " + id + " no existe.");
+        }
+        cuenta.setEstado(false);
+        actulizarDatosCuenta(id, 0.0, false);
         return cuenta;
     }
 }

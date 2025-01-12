@@ -91,7 +91,7 @@ public class Cliente extends Persona{
 
     public void addPrestamo(Prestamo prestamo) {
         this.prestamos.add(prestamo);
-        prestamo.setNumeroCliente(this);
+        prestamo.setDniTitular(prestamo.getDniTitular());
     }
 
     public boolean tieneCuenta(TipoCuenta tipoCuenta, TipoMoneda moneda) {

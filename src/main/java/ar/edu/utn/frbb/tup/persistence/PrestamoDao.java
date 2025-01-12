@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.persistence;
 
 import ar.edu.utn.frbb.tup.model.Prestamo;
-import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.persistence.entity.PrestamoEntity;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +15,9 @@ public class PrestamoDao extends AbstractBaseDao {
         return "PRESTAMO";
     }
 
-    public void savePrestamo(PrestamoEntity prestamoEntity) {
-        getInMemoryDatabase().put(prestamoEntity.getId(), prestamoEntity);
+    public void savePrestamo(Prestamo prestamo) {
+        PrestamoEntity entity = new PrestamoEntity(prestamo);
+        getInMemoryDatabase().put(entity.getId(), entity);
     }
 
     //busca prestamo por id del prestamo
@@ -25,28 +25,36 @@ public class PrestamoDao extends AbstractBaseDao {
         if (getInMemoryDatabase().get(id) == null) {
             return null;
         }
-        return ((PrestamoEntity) getInMemoryDatabase().get(id)).toPrestamo();
+        Prestamo prestamo = ((PrestamoEntity) getInMemoryDatabase().get(id)).toPrestamo();
+        return prestamo;
     }
 
     //obtiene prestamos por numero de cliente
-    public List<Prestamo> getPrestamoByCliente(long dni) {
+    public List<Prestamo> buscarPrestamoPorCliente(long dni) {
         List<Prestamo> prestamosDelCliente = new ArrayList<>();
         for (Object object: getInMemoryDatabase().values()) {
             PrestamoEntity prestamo = ((PrestamoEntity) object);
-            if (prestamo.getNumeroCliente() == dni) {
+            if (prestamo.toPrestamo().getDniTitular() == dni) {
                 prestamosDelCliente.add(prestamo.toPrestamo());
             }
         }
         return prestamosDelCliente;
     }
 
-    public Prestamo update(long id, LoanStatus estado) {
-        PrestamoEntity prestamoEntity = (PrestamoEntity) getInMemoryDatabase().get(id);
-        if (prestamoEntity == null) {
-            throw new IllegalArgumentException("El prestamo con ID: " + id + " no existe.");
+    //agregar exception
+    public Prestamo update(Prestamo prestamo) {
+        Prestamo actualizado = findPrestamo(prestamo.getId());
+        if (actualizado != null) {
+            if (prestamo.getCuotasPagadas() != 0) {
+                actualizado.setCuotasPagadas(prestamo.getCuotasPagadas());
+            }
+            if (prestamo.getCuotasRestantes() != 0) {
+                actualizado.setCuotasRestantes(prestamo.getCuotasRestantes());
+            }
+            System.out.println("Datos actualizados.");
+        } else {
+            throw new IllegalArgumentException("Prestamo no encontrado.");
         }
-        prestamoEntity.setEstado(estado);
-        getInMemoryDatabase().put(id, prestamoEntity);
-        return prestamoEntity.toPrestamo();
+        return actualizado;
     }
 }

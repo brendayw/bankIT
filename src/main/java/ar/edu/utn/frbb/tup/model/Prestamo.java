@@ -2,96 +2,104 @@ package ar.edu.utn.frbb.tup.model;
 
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
+
+import java.time.LocalDate;
+import java.util.Random;
 
 public class Prestamo {
-    private long id_loan;
-    Cliente numeroCliente;
-    private double amount;  // Monto del préstamo
-    private double interestRate; // Tasa de interés anual
-    private int termMonths;// Plazo en meses (12 meses, 24 meses, etc.)
-    private String requestDate;
-    private String approvalDate;
+    private long id;
+    private long dniTitular;
+    private double monto;
+    private double montoConInteres;
+    private int plazoMeses;
+    private TipoMoneda moneda;
+
+    private LocalDate solicitudFecha;
+    private LocalDate aprovacionFecha;
     private LoanStatus loanStatus;
-    private String moneda;
+
     private double cuotaMensual;
     private int cuotasPagadas;
     private int cuotasRestantes;
 
     //constructores
-    public Prestamo(PrestamoDto prestamoDto, Cliente cliente) {
-        this.numeroCliente = cliente;
-        this.amount = prestamoDto.getMontoPrestamo();
-        this.termMonths = prestamoDto.getPlazoMeses();
-        this.moneda = prestamoDto.getMoneda();
-    }
     public Prestamo() {
-
+        this.id = new Random().nextLong();
     }
-    public Prestamo(long id_loan, double amount, double interestRate, int termMonths, String requestDate, String approvalDate, LoanStatus loanStatus, String moneda) {
-        this.id_loan = id_loan;
-        this.amount = amount;
-        this.interestRate = interestRate;
-        this.termMonths = termMonths;
-        this.requestDate = requestDate;
-        this.approvalDate = approvalDate;
-        this.loanStatus = loanStatus;
+    public Prestamo(long id, long dniTitular, double monto, double montoConInteres, int plazoMeses, TipoMoneda moneda, LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, double cuotaMensual, int cuotasPagadas, int cuotasRestantes) {
+        this.id = id;
+        this.dniTitular = dniTitular;
+        this.monto = monto;
+        this.montoConInteres = montoConInteres;
+        this.plazoMeses = plazoMeses;
         this.moneda = moneda;
+        this.solicitudFecha = solicitudFecha;
+        this.aprovacionFecha = aprovacionFecha;
+        this.loanStatus = loanStatus;
         this.cuotaMensual = cuotaMensual;
         this.cuotasPagadas = cuotasPagadas;
         this.cuotasRestantes = cuotasRestantes;
     }
 
-    /*// Métodos de validación
-    private boolean isValidLoanId(long id_loan) {
-        return id_loan != 0;
+    public Prestamo(PrestamoDto prestamoDto) {
+        id = Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
+        dniTitular = prestamoDto.getDniTitular();
+        monto = prestamoDto.getMontoPrestamo();
+        moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
+        plazoMeses = prestamoDto.getPlazoMeses();
+        this.solicitudFecha = LocalDate.now();
+        loanStatus = LoanStatus.PENDIENTE;
     }
-
-    private boolean isValidAmount(double amount) {
-        return amount > 0;
-    }
-
-    private boolean isValidInterestRate(double interestRate) {
-        return interestRate > 0 && interestRate <= 100;
-    }
-
-    private boolean isValidTermMonths(int termMonths) {
-        return termMonths > 0 && termMonths <= 120; // de 1 a 10 años
-    }*/
 
     // getters & setters
-    public long getId_loan() {
-        return id_loan;
+    public long getId() {
+        return id;
     }
-    public void setId_loan(long id_loan) {
-        this.id_loan = id_loan;
-    }
-
-    public Cliente getNumeroCliente() {
-        return numeroCliente;
-    }
-    public void setNumeroCliente(Cliente numeroCliente) {
-        this.numeroCliente = numeroCliente;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public double getAmount() {
-        return amount;
+    public long getDniTitular() {
+        return dniTitular;
     }
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public double getInterestRate() {
-        return interestRate;
-    }
-    public void setInterestRate(double interestRate) {
-        this.interestRate = interestRate;
+    public void setDniTitular(long dniTitular) {
+        this.dniTitular = dniTitular;
     }
 
-    public int getTermMonths() {
-        return termMonths;
+    public double getMonto() {
+        return monto;
     }
-    public void setTermMonths(int termMonths) {
-        this.termMonths = termMonths;
+    public void setMonto(double monto) {
+        this.monto = monto;
+    }
+
+    public double getmontoConInteres() {
+        return montoConInteres;
+    }
+    public void setmontoConInteres(double montoConInteres) {
+        this.montoConInteres = montoConInteres;
+    }
+
+    public int getPlazoMeses() {
+        return plazoMeses;
+    }
+    public void setPlazoMeses(int plazoMeses) {
+        this.plazoMeses = plazoMeses;
+    }
+
+    public LocalDate getSolicitudFecha() {
+        return solicitudFecha;
+    }
+    public void setSolicitudFecha(LocalDate solicitudFecha) {
+        this.solicitudFecha = solicitudFecha;
+    }
+
+    public LocalDate getAprovacionFecha() {
+        return aprovacionFecha;
+    }
+    public void setAprovacionFecha(LocalDate aprovacionFecha) {
+        this.aprovacionFecha = aprovacionFecha;
     }
 
     public LoanStatus getLoanStatus() {
@@ -101,24 +109,10 @@ public class Prestamo {
         this.loanStatus = loanStatus;
     }
 
-    public String getRequestDate() {
-        return requestDate;
-    }
-    public void setRequestDate(String requestDate) {
-        this.requestDate = requestDate;
-    }
-
-    public String getApprovalDate() {
-        return approvalDate;
-    }
-    public void setApprovalDate(String approvalDate) {
-        this.approvalDate = approvalDate;
-    }
-
-    public String getMoneda() {
+    public TipoMoneda getMoneda() {
         return moneda;
     }
-    public void setMoneda(String moneda) {
+    public void setMoneda(TipoMoneda moneda) {
         this.moneda = moneda;
     }
 
@@ -146,14 +140,14 @@ public class Prestamo {
     @Override
     public String toString() {
         return "Prestamo: " +
-                "\nId del prestamo: " + id_loan +
-                "\nNumero de cliente: " + numeroCliente +
-                "\nMonto total: " + amount +
+                "\nId del prestamo: " + id +
+                "\nNumero de cliente: " + dniTitular +
+                "\nMonto total: " + monto +
                 "\nMoneda: " + moneda +
-                "\nTasa de interes: " + interestRate +
-                "\nPlazo en meses: " + termMonths +
-                "\nFecha de solicitud: " +requestDate +
-                "\nFecha de aprovacion: " + approvalDate +
+                "\nMonto con Interes " + montoConInteres +
+                "\nPlazo en meses: " + plazoMeses +
+                "\nFecha de solicitud: " + solicitudFecha +
+                "\nFecha de aprovacion: " + aprovacionFecha +
                 "\nEstado: " + loanStatus +
                 "\nMonto cuota mensual: " + cuotaMensual +
                 "\nCuotas pagadas: " + cuotasPagadas +

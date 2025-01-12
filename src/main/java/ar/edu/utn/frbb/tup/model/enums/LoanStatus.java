@@ -7,18 +7,21 @@ public enum LoanStatus {
     DESEMBOLSADO("D"),
     CERRADO("C");
 
-    private final String type1;
+    private final String descripcion;
 
-    LoanStatus(String type1) {
-        this.type1 = type1;
+    LoanStatus(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public static LoanStatus fromString(String typeStr) {
-        for (LoanStatus type1 : LoanStatus.values()) {
-            if (type1.type1.equals(typeStr)) {
-                return type1;
+    public String getDescripcion() {
+        return descripcion;
+    }
+    public static LoanStatus fromString(String text) {
+        for (LoanStatus tipo : LoanStatus.values()) {
+            if (tipo.descripcion.equals(text)) {
+                return tipo;
             }
         }
-        throw new IllegalArgumentException("Estado del prestamo no valido: " + typeStr);
+        throw new IllegalArgumentException("Estado del prestamo no valido: " + text);
     }
 }

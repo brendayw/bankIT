@@ -42,7 +42,7 @@ public class ClienteEntity extends BaseEntity {
         }
         if (cliente.getPrestamos() != null && !cliente.getPrestamos().isEmpty()) {
             for (Prestamo p: cliente.getPrestamos()) {
-                prestamos.add(p.getId_loan());
+                prestamos.add(p.getId());
             }
         }
     }

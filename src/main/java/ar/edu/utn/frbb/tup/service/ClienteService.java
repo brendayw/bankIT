@@ -52,10 +52,11 @@ public class ClienteService {
     //agrega el prestamo
     public void agregarPrestamo(Prestamo prestamo, long dniTitular) throws ClientNoExisteException {
         Cliente titular = buscarClientePorDni(dniTitular);
-        prestamo.setNumeroCliente(titular);
-        PrestamoDto prestamoDto = new PrestamoDto(prestamo);
-        prestamoService.solicitarPrestamo(prestamoDto);
-        titular.addPrestamo(prestamo);
+        //prestamo.setDniTitular(titular);
+        if (titular == null) {
+            throw new ClientNoExisteException("El cliente con DNI: " + dniTitular + " no existe.");
+        }
+        titular.getPrestamos().add(prestamo);
         clienteDao.save(titular);
     }
 

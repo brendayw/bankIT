@@ -2,53 +2,54 @@ package ar.edu.utn.frbb.tup.controller;
 
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.controller.validator.PrestamoValidator;
-import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.service.ClienteService;
+import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoMonedaNoSoportada;
 import ar.edu.utn.frbb.tup.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/prestamo")
 public class PrestamoController {
+    @Autowired
+    private PrestamoService prestamoService;
 
-    @Autowired private PrestamoService prestamoService;
-
-    @Autowired private PrestamoValidator prestamoValidator;
-    @Autowired private ClienteService clienteService;
+    @Autowired
+    private PrestamoValidator prestamoValidator;
 
     @PostMapping
-    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException {
+    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException , TipoMonedaNoSoportada{
         prestamoValidator.validate(prestamoDto);
-        Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
-        Prestamo prestamo = new Prestamo(prestamoDto, cliente);
-        prestamo = prestamoService.solicitarPrestamo(prestamoDto);
-        return prestamo;
+        return prestamoService.darAltaPrestamo(prestamoDto);
     }
 
+    //busca prestamo por id de prestamo
     @GetMapping("/{id}")
-    public Prestamo getPrestamoById(@PathVariable long id) {
-        Prestamo prestamo = prestamoService.buscarPrestamoPorId(id);
-        if (prestamo == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Prestamo no encontrado");
-        }
+    public Prestamo obtenerPrestamoPorId(@PathVariable long id) {
+        return prestamoService.buscarPrestamoPorId(id);
+    }
+
+    //busca prestamo por dni de cliente
+    @GetMapping("/cliente/{dni}")
+    public List<Prestamo> obtenerPrestamosPorCliente(@PathVariable long dni) throws ClientNoExisteException {
+        return prestamoService.buscarPrestamosPorCliente(dni);
+    }
+
+    //actualizar
+    @PutMapping("/{id}")
+    public Prestamo actualizarPrestamo(@PathVariable long id, @RequestBody Prestamo prestamoActualizado) {
+        Prestamo prestamo = prestamoService.actualizarDatosPrestamo(id, prestamoActualizado.getMonto(), prestamoActualizado.getLoanStatus(), prestamoActualizado.getCuotasPagadas(), prestamoActualizado.getCuotasRestantes());
         return prestamo;
     }
 
-    @GetMapping("/cliente/{numeroCliente}")
-    public List<Prestamo> getPrestamosByCliente(@PathVariable long numeroCliente) {
-        List<Prestamo> prestamos = prestamoService.buscarPrestamosPorCliente(numeroCliente);
-        if (prestamos.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron préstamos para el cliente.");
-        }
-        return prestamos;
+    @DeleteMapping("/{id}")
+    public Prestamo cerrarPrestamo(@PathVariable long id) {
+        return prestamoService.cerrarPrestamo(id);
     }
+
 
 
 }
