@@ -20,11 +20,7 @@ public class Prestamo {
     private LocalDate aprovacionFecha;
     private LoanStatus loanStatus;
     private String mensaje;
-    //private double cuotaMensual;
-    //private int cuotasPagadas;
-    //private int cuotasRestantes;
     private List<PlanPago> planDePagos;
-//    private String mensaje;
 
     //constructores
     public Prestamo() {
@@ -32,8 +28,7 @@ public class Prestamo {
     }
 
     public Prestamo(long id, long dniTitular, double monto, double montoConInteres, int plazoMeses, TipoMoneda moneda,
-                    LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, String mensaje, double cuotaMensual,
-                    int cuotasPagadas, int cuotasRestantes, List<PlanPago> planDePagos) {
+                    LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, String mensaje, List<PlanPago> planDePagos) {
         this.id = id;
         this.dniTitular = dniTitular;
         this.monto = monto;
@@ -44,9 +39,6 @@ public class Prestamo {
         this.aprovacionFecha = aprovacionFecha;
         this.loanStatus = loanStatus;
         this.mensaje = mensaje;
-        //this.cuotaMensual = cuotaMensual;
-        //this.cuotasPagadas = cuotasPagadas;
-        //this.cuotasRestantes = cuotasRestantes;
         this.planDePagos = new ArrayList<>();
     }
 
@@ -102,20 +94,6 @@ public class Prestamo {
         this.plazoMeses = plazoMeses;
     }
 
-    public LocalDate getSolicitudFecha() {
-        return solicitudFecha;
-    }
-    public void setSolicitudFecha(LocalDate solicitudFecha) {
-        this.solicitudFecha = solicitudFecha;
-    }
-
-    public LocalDate getAprovacionFecha() {
-        return aprovacionFecha;
-    }
-    public void setAprovacionFecha(LocalDate aprovacionFecha) {
-        this.aprovacionFecha = aprovacionFecha;
-    }
-
     public LoanStatus getLoanStatus() {
         return loanStatus;
     }
@@ -129,6 +107,20 @@ public class Prestamo {
     }
     public void setMoneda(TipoMoneda moneda) {
         this.moneda = moneda;
+    }
+
+    public List<PlanPago> getPlanDePagos() {
+        return planDePagos;
+    }
+    public void setPlanDePagos(List<PlanPago> planDePagos) {
+        this.planDePagos = planDePagos;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 
     //otros metodos
@@ -156,41 +148,6 @@ public class Prestamo {
         return cuotas;
     }
 
-//    public double getCuotaMensual() {
-//        return cuotaMensual;
-//    }
-//    public void setCuotaMensual(double cuotaMensual) {
-//        this.cuotaMensual = cuotaMensual;
-//    }
-//
-//    public int getCuotasPagadas() {
-//        return cuotasPagadas;
-//    }
-//    public void setCuotasPagadas(int cuotasPagadas) {
-//        this.cuotasPagadas = cuotasPagadas;
-//    }
-//
-//    public int getCuotasRestantes() {
-//        return cuotasRestantes;
-//    }
-//    public void setCuotasRestantes(int cuotasRestantes) {
-//        this.cuotasRestantes = cuotasRestantes;
-//    }
-
-    public List<PlanPago> getPlanDePagos() {
-        return planDePagos;
-    }
-    public void setPlanDePagos(List<PlanPago> planDePagos) {
-        this.planDePagos = planDePagos;
-    }
-
-    public String getMensaje() {
-        return mensaje;
-    }
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
-    }
-
     @Override
     public String toString() {
         return "Prestamo: " +
@@ -203,8 +160,5 @@ public class Prestamo {
                 "\nFecha de solicitud: " + solicitudFecha +
                 "\nFecha de aprovacion: " + aprovacionFecha +
                 "\nEstado: " + loanStatus;
-//                "\nMonto cuota mensual: " + cuotaMensual +
-//                "\nCuotas pagadas: " + cuotasPagadas +
-//                "\nCuotas restantes: " + cuotasRestantes;
     }
 }

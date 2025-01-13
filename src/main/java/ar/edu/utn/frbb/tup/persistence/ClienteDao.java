@@ -8,6 +8,9 @@ import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ClienteDao extends AbstractBaseDao {
 
@@ -38,6 +41,15 @@ public class ClienteDao extends AbstractBaseDao {
         return cliente;
     }
 
+    public List<Cliente> findAll() {
+       List<Cliente> clientes = new ArrayList<>();
+       for (Object object : getInMemoryDatabase().values()) {
+           clientes.add(((ClienteEntity) object).toCliente());
+       }
+       return clientes;
+    }
+
+    //aca arroja empty fields
     public void save(Cliente cliente) {
         ClienteEntity entity = new ClienteEntity(cliente);
         getInMemoryDatabase().put(entity.getId(), entity);

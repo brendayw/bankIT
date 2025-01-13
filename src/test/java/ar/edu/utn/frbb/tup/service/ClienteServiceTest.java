@@ -70,7 +70,7 @@ public class ClienteServiceTest {
         pepeRino.setFechaNacimiento("1978-03-18");
         pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA.toString());
 
-        when(clienteDao.find(26456437, false)).thenReturn(new Cliente());
+        when(clienteDao.find(26456437L, false)).thenReturn(new Cliente());
 
         assertThrows(ClienteAlreadyExistsException.class, () -> clienteService.darDeAltaCliente(pepeRino));
     }
@@ -80,7 +80,7 @@ public class ClienteServiceTest {
     @Test
     public void testAgregarCuentaAClienteSuccess() throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente pepeRino = new Cliente();
-        pepeRino.setDni(26456439);
+        pepeRino.setDni(26456439L);
         pepeRino.setNombre("Pepe");
         pepeRino.setApellido("Rino");
         pepeRino.setFechaNacimiento(LocalDate.of(1978, 3,25));
@@ -91,7 +91,7 @@ public class ClienteServiceTest {
                 .setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        when(clienteDao.find(26456439, true)).thenReturn(pepeRino);
+        when(clienteDao.find(26456439L, true)).thenReturn(pepeRino);
 
         clienteService.agregarCuenta(cuenta, pepeRino.getDni());
 
@@ -106,7 +106,7 @@ public class ClienteServiceTest {
     @Test
     public void testAgregarCuentaAClienteDuplicada() throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente luciano = new Cliente();
-        luciano.setDni(26456439);
+        luciano.setDni(26456439L);
         luciano.setNombre("Pepe");
         luciano.setApellido("Rino");
         luciano.setFechaNacimiento(LocalDate.of(1978, 3,25));
@@ -117,7 +117,7 @@ public class ClienteServiceTest {
                 .setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
-        when(clienteDao.find(26456439, true)).thenReturn(luciano);
+        when(clienteDao.find(26456439L, true)).thenReturn(luciano);
 
         clienteService.agregarCuenta(cuenta, luciano.getDni());
 

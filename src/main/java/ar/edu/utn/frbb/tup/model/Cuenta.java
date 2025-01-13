@@ -5,9 +5,7 @@ import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 public class Cuenta {
     private long numeroCuenta;

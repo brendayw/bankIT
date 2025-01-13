@@ -6,9 +6,7 @@ import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
-import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaYaExisteException;
-import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
+import ar.edu.utn.frbb.tup.model.exception.cuenta.*;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,8 @@ public class CuentaService {
         this.cuentaDao = cuentaDao;
     }
 
-    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException {
+    //agregar tipocuentayaexiste
+    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
         Cuenta cuenta = new Cuenta(cuentaDto);
         long numeroCuenta = cuenta.getNumeroCuenta();
         while (cuentaDao.find(numeroCuenta) != null) {
@@ -43,29 +42,17 @@ public class CuentaService {
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaYaExisteException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }
-//        //Chequear cuentas soportadas por el banco CA$ CC$ CAU$S
-//        if (!tipoCuentaEstaSoportada(cuenta)) {
-//           throw new CuentaNoSoportadaException("El tipo de cuenta no es soportado.");
-//        }
-//        if (!tipoMonedaEstaSoportada(cuenta)) {
-//            throw new TipoMonedaNoSoportada("El tipo de moneda no es soportado.");
-//        }
+        //Chequear cuentas soportadas por el banco CA$ CC$ CAU$S
+        if (!tipoCuentaEstaSoportada(cuenta)) {
+           throw new CuentaNoSoportadaException("El tipo de cuenta no es soportado.");
+        }
+        if (!tipoMonedaEstaSoportada(cuenta)) {
+            throw new TipoMonedaNoSoportada("El tipo de moneda no es soportado.");
+        }
         clienteService.agregarCuenta(cuenta, cuenta.getDniTitular());
         cuentaDao.save(cuenta);
         return cuenta;
     }
-
-
-//    public boolean tipoCuentaEstaSoportada(Cuenta cuenta) {
-//        boolean tipoCuentaSoportada;
-//        tipoCuentaSoportada = cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE || cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO;
-//        return tipoCuentaSoportada;
-//    }
-//    public boolean tipoMonedaEstaSoportada(Cuenta cuenta) {
-//        boolean tipoMonedaSoportada;
-//        tipoMonedaSoportada = cuenta.getTipoMoneda() == TipoMoneda.DOLARES|| cuenta.getTipoMoneda() == TipoMoneda.PESOS;
-//        return tipoMonedaSoportada;
-//    }
 
     public Cuenta buscarCuentaPorId(long id) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);
@@ -87,6 +74,9 @@ public class CuentaService {
         return new ArrayList<>(cuentas);
     }
 
+    public List<Cuenta> buscarCuentas() {
+        return cuentaDao.findAll();
+    }
     //actualiza balance y estado
     public Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);
@@ -103,14 +93,6 @@ public class CuentaService {
         return cuenta;
     }
 
-    //actualizar balance de cuenta
-//    public double actualizarBalanceCuenta(Cuenta cuenta, double montoPrestamo) {
-//        double balanceActual = cuenta.getBalance();
-//        double nuevoBalance = balanceActual + montoPrestamo;
-//        cuenta.setBalance(nuevoBalance);
-//        return nuevoBalance;
-//    }
-
     //delete
     public Cuenta desactivarCuenta(long id) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);
@@ -120,5 +102,17 @@ public class CuentaService {
         cuenta.setEstado(false);
         actulizarDatosCuenta(id, 0.0, false);
         return cuenta;
+    }
+
+    //otro metodos
+    public boolean tipoCuentaEstaSoportada(Cuenta cuenta) {
+        boolean tipoCuentaSoportada;
+        tipoCuentaSoportada = cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE || cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO;
+        return tipoCuentaSoportada;
+    }
+    public boolean tipoMonedaEstaSoportada(Cuenta cuenta) {
+        boolean tipoMonedaSoportada;
+        tipoMonedaSoportada = cuenta.getTipoMoneda() == TipoMoneda.DOLARES|| cuenta.getTipoMoneda() == TipoMoneda.PESOS;
+        return tipoMonedaSoportada;
     }
 }

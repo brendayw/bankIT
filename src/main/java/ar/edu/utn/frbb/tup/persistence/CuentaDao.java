@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.persistence;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
 import ar.edu.utn.frbb.tup.persistence.entity.CuentaEntity;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +23,14 @@ public class CuentaDao  extends AbstractBaseDao{
         return cuenta;
     }
 
+    public List<Cuenta> findAll() {
+        List<Cuenta> cuentas = new ArrayList<>();
+        for (Object object : getInMemoryDatabase().values()) {
+            cuentas.add(((CuentaEntity) object).toCuenta());
+        }
+        return cuentas;
+    }
+
     public void save(Cuenta cuenta) {
         CuentaEntity entity = new CuentaEntity(cuenta);
         getInMemoryDatabase().put(entity.getId(), entity);
@@ -40,15 +47,13 @@ public class CuentaDao  extends AbstractBaseDao{
         return cuentasDelCliente;
     }
 
-    public Cuenta update(Cuenta cuenta) throws CuentaNoExisteException {
+    public Cuenta update(Cuenta cuenta) {
         Cuenta actualizado = find(cuenta.getNumeroCuenta());
         if (actualizado != null) {
             if (cuenta.getBalance() != 0.0) {
                 actualizado.setBalance(cuenta.getBalance());
             }
             System.out.println("Datos actualizados con exito.");
-        } else {
-            throw new CuentaNoExisteException("Cuenta no encontrada.");
         }
         return actualizado;
     }

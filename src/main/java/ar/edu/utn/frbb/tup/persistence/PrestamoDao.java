@@ -29,6 +29,14 @@ public class PrestamoDao extends AbstractBaseDao {
         return prestamo;
     }
 
+    public List<Prestamo> findAll() {
+        List<Prestamo> prestamos = new ArrayList<>();
+        for (Object object : getInMemoryDatabase().values()) {
+            prestamos.add(((PrestamoEntity) object).toPrestamo());
+        }
+        return prestamos;
+    }
+
     //obtiene prestamos por numero de cliente
     public List<Prestamo> buscarPrestamoPorCliente(long dni) {
         List<Prestamo> prestamosDelCliente = new ArrayList<>();
@@ -41,19 +49,12 @@ public class PrestamoDao extends AbstractBaseDao {
         return prestamosDelCliente;
     }
 
+    //verificar
     //agregar exception
     public Prestamo update(Prestamo prestamo) {
         Prestamo actualizado = findPrestamo(prestamo.getId());
         if (actualizado != null) {
-//            if (prestamo.getCuotasPagadas() != 0) {
-//                actualizado.setCuotasPagadas(prestamo.getCuotasPagadas());
-//            }
-//            if (prestamo.getCuotasRestantes() != 0) {
-//                actualizado.setCuotasRestantes(prestamo.getCuotasRestantes());
-//            }
             System.out.println("Datos actualizados.");
-        } else {
-            throw new IllegalArgumentException("Prestamo no encontrado.");
         }
         return actualizado;
     }

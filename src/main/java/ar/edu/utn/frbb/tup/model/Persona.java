@@ -24,7 +24,6 @@ public class Persona {
     public String getNombre() {
         return nombre;
     }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -32,7 +31,6 @@ public class Persona {
     public String getApellido() {
         return apellido;
     }
-
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
@@ -40,7 +38,6 @@ public class Persona {
     public long getDni() {
         return dni;
     }
-
     public void setDni(long dni) {
         this.dni = dni;
     }
@@ -48,7 +45,6 @@ public class Persona {
     public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
-
     public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
@@ -56,7 +52,6 @@ public class Persona {
     public String getTelefono() {
         return telefono;
     }
-
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
@@ -64,7 +59,6 @@ public class Persona {
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
