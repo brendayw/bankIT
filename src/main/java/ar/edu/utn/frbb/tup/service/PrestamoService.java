@@ -52,7 +52,15 @@ public class PrestamoService {
         prestamo.setMontoConInteres(montoConInteres);
         clienteService.agregarPrestamo(prestamo, prestamo.getDniTitular());
         prestamoDao.savePrestamo(prestamo);
+
+        //actualiza saldo
+//        Cuenta cuenta = cliente.getCuenta();
+//        double saldoActual = cuenta.getSaldo();
+//        cuenta.setSaldo(saldoActual + montoPrestamo);
+//        cuentaRepository.save(cuenta);
         return prestamo;
+
+
     }
 
     //busca todos los prestamos
@@ -122,4 +130,7 @@ public class PrestamoService {
         double montoConInteres = monto + interes;
         return montoConInteres;
     }
+
+    //actuliza balance si el prestamo es rechazado
+
 }

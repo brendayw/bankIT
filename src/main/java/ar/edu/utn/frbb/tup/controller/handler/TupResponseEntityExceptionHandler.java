@@ -22,9 +22,14 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
 
     //BAD_REQUEST (400)
     //datos de entrada inválidos o no soportados
-    @ExceptionHandler({TipoMonedaNoSoportada.class, TipoPersonaNoSoportada.class,  CampoIncorrecto.class, CuentaNoSoportadaException.class})
+    @ExceptionHandler({
+            TipoMonedaNoSoportada.class,
+            TipoPersonaNoSoportada.class,
+            CampoIncorrecto.class,
+            CuentaNoSoportadaException.class})
     protected ResponseEntity<Object> handleUnsupportedOrInvalidInputs(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();// el json que devuelve el error
+        error.setErrorCode(400);
         error.setErrorMessage(ex.getMessage());// settea el mensaje que le claves en el json
         return handleExceptionInternal(ex, error,//aca hace sus chiches
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);// aca ponele el status code
@@ -35,6 +40,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     @ExceptionHandler({IllegalArgumentException.class, ClienteMayorDeEdadException.class, /*NoAlcanzaException.class*/})
     protected ResponseEntity<Object> handleInvalidBusinessRules(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
+        error.setErrorCode(400);
         error.setErrorMessage(ex.getMessage());
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
@@ -45,6 +51,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     @ExceptionHandler({TipoCuentaYaExisteException.class, CuentaYaExisteException.class, ClienteAlreadyExistsException.class})
     protected ResponseEntity<Object> handleResourceAlreadyExists(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
+        error.setErrorCode(409);
         error.setErrorMessage(ex.getMessage());
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.CONFLICT, request);
@@ -55,6 +62,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     @ExceptionHandler({PrestamoNoExisteException.class, ClientNoExisteException.class, CuentaNoExisteException.class, })
     protected ResponseEntity<Object> handleResourceNotFound(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
+        error.setErrorCode(404);
         error.setErrorMessage(ex.getMessage());
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
@@ -65,7 +73,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     @ExceptionHandler({IllegalStateException.class})
     protected ResponseEntity<Object> handleIllegalState(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
-        error.setErrorCode(12354); // Código específico para identificar este error
+        error.setErrorCode(404); // Código específico para identificar este error
         error.setErrorMessage(ex.getMessage());
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
