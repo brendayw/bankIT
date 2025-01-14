@@ -26,7 +26,7 @@ public class ClienteController {
     //crea cliente
     @PostMapping
     public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException, ClienteMayorDeEdadException {
-        clienteValidator.validate(clienteDto);
+        clienteValidator.validateCliente(clienteDto);
         return clienteService.darDeAltaCliente(clienteDto);
     }
 

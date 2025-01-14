@@ -26,7 +26,7 @@ public class PrestamoController {
 
     @PostMapping
     public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, TipoMonedaNoSoportada, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
-        prestamoValidator.validate(prestamoDto);
+        prestamoValidator.validatePrestamo(prestamoDto);
         return prestamoService.darAltaPrestamo(prestamoDto);
     }
 

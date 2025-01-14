@@ -50,17 +50,13 @@ public class PrestamoService {
         }
         double montoConInteres = calcularInteres(prestamoDto);
         prestamo.setMontoConInteres(montoConInteres);
-        clienteService.agregarPrestamo(prestamo, prestamo.getDniTitular());
         prestamoDao.savePrestamo(prestamo);
 
-        //actualiza saldo
-//        Cuenta cuenta = cliente.getCuenta();
-//        double saldoActual = cuenta.getSaldo();
-//        cuenta.setSaldo(saldoActual + montoPrestamo);
-//        cuentaRepository.save(cuenta);
+        if (prestamo.getLoanStatus() == LoanStatus.APROBADO) {
+            cuentaService.actualizarBalance(prestamo);
+        }
+        clienteService.agregarPrestamo(prestamo, prestamo.getDniTitular());
         return prestamo;
-
-
     }
 
     //busca todos los prestamos

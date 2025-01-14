@@ -23,7 +23,7 @@ public class CuentaController {
     //crea cuenta
     @PostMapping
     public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
-        cuentaValidator.validate(cuentaDto);
+        cuentaValidator.validateCuenta(cuentaDto);
         return cuentaService.darDeAltaCuenta(cuentaDto);
     }
 

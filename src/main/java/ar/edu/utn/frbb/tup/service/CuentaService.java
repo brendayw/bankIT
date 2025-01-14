@@ -1,8 +1,10 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
@@ -18,7 +20,6 @@ import java.util.Set;
 @Service
 public class CuentaService {
     CuentaDao cuentaDao;
-
     @Autowired
     ClienteService clienteService;
 
@@ -77,6 +78,7 @@ public class CuentaService {
     public List<Cuenta> buscarCuentas() {
         return cuentaDao.findAll();
     }
+
     //actualiza balance y estado
     public Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException {
         Cuenta cuenta = cuentaDao.find(id);
@@ -91,6 +93,18 @@ public class CuentaService {
         }
         cuentaDao.update(cuenta);
         return cuenta;
+    }
+
+    //actualizar si el prestamo se aprueba
+    public void actualizarBalance(Prestamo prestamo) throws CuentaNoExisteException {
+        long dniTitular = prestamo.getDniTitular();
+        Cuenta cuenta = cuentaDao.findByClienteYTipoMoneda(dniTitular, prestamo.getMoneda().toString());
+        if (cuenta == null) {
+            throw new CuentaNoExisteException("La cuenta no existe.");
+        }
+        double nuevoBalance = cuenta.getBalance() + prestamo.getMonto();
+        cuenta.setBalance(nuevoBalance);
+        cuentaDao.save(cuenta);
     }
 
     //delete

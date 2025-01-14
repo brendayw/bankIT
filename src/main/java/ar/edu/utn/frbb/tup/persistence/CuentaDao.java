@@ -1,6 +1,7 @@
 package ar.edu.utn.frbb.tup.persistence;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.persistence.entity.CuentaEntity;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,17 @@ public class CuentaDao  extends AbstractBaseDao{
             cuentas.add(((CuentaEntity) object).toCuenta());
         }
         return cuentas;
+    }
+
+    //busca si el cliente tiene la cuenta en esa moneda
+    public Cuenta findByClienteYTipoMoneda(long dni, String tipoMoneda) {
+        List<Cuenta> cuentas = findAll();
+        for (Cuenta cuenta : cuentas) {
+            if (cuenta.getDniTitular() == dni && cuenta.getTipoMoneda().toString().equals(tipoMoneda)) {
+                return cuenta;
+            }
+        }
+        return null;
     }
 
     public void save(Cuenta cuenta) {
