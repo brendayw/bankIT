@@ -123,7 +123,7 @@ public class ClienteServiceTest {
 
         Cuenta cuenta2 = new Cuenta()
                 .setTipoMoneda(TipoMoneda.PESOS)
-                .setBalance(500.00)
+                //.setBalance(500.00)
                 .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
 
         assertThrows(TipoCuentaYaExisteException.class, () -> clienteService.agregarCuenta(cuenta2, luciano.getDni()));
