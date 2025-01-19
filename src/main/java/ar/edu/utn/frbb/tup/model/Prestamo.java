@@ -4,6 +4,7 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,48 +15,29 @@ public class Prestamo {
     private long dniTitular;
     private double monto;
     private double montoConInteres;
+    private TipoMoneda moneda; //lo marca como string
     private int plazoMeses;
-    private TipoMoneda moneda;
-    private LocalDate solicitudFecha;
-    private LocalDate aprovacionFecha;
-    private LoanStatus loanStatus;
+    private LocalDate fechaSolicitud;
+    private LoanStatus loanStatus; //lo marca como string
     private String mensaje;
     private List<PlanPago> planDePagos;
 
     //constructores
     public Prestamo() {
-        this.id = new Random().nextLong();
-    }
-
-    public Prestamo(long id, long dniTitular, double monto, double montoConInteres, int plazoMeses, TipoMoneda moneda,
-                    LocalDate solicitudFecha, LocalDate aprovacionFecha, LoanStatus loanStatus, String mensaje, List<PlanPago> planDePagos) {
-        this.id = id;
-        this.dniTitular = dniTitular;
-        this.monto = monto;
-        this.montoConInteres = montoConInteres;
-        this.plazoMeses = plazoMeses;
-        this.moneda = moneda;
-        this.solicitudFecha = solicitudFecha;
-        this.aprovacionFecha = aprovacionFecha;
-        this.loanStatus = loanStatus;
-        this.mensaje = mensaje;
+        this.id = generarIdAleatorio();
+        this.fechaSolicitud = LocalDate.now();
         this.planDePagos = new ArrayList<>();
     }
 
     public Prestamo(PrestamoDto prestamoDto, int score) {
-        id = Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
-        dniTitular = prestamoDto.getDniTitular();
-        monto = prestamoDto.getMontoPrestamo();
-        moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
-        plazoMeses = prestamoDto.getPlazoMeses();
-        this.solicitudFecha = LocalDate.now();
-        if (score >= 700) {
-            this.loanStatus = LoanStatus.APROBADO;
-        } else {
-            this.loanStatus = LoanStatus.RECHAZADO;
-        }
-        mensaje = devolverMensaje(this.loanStatus);
-        planDePagos = calcularPlanPagos();
+        this.id = generarIdAleatorio();
+        this.dniTitular = prestamoDto.getNumeroCliente();
+        this.monto = prestamoDto.getMontoPrestamo();
+        this.moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
+        this.plazoMeses = prestamoDto.getPlazoMeses();
+        this.loanStatus = score >= 700 ? LoanStatus.APROBADO : LoanStatus.RECHAZADO;
+        this.mensaje = devolverMensaje(this.loanStatus);
+        this.planDePagos = calcularPlanPagos();
     }
 
     // getters & setters
@@ -85,6 +67,14 @@ public class Prestamo {
     }
     public void setMontoConInteres(double montoConInteres) {
         this.montoConInteres = montoConInteres;
+    }
+
+
+    public LocalDate getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+    public void setFechaSolicitud(LocalDate fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 
     public int getPlazoMeses() {
@@ -124,6 +114,10 @@ public class Prestamo {
     }
 
     //otros metodos
+    private long generarIdAleatorio() {
+        return Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
+    }
+
     public String devolverMensaje(LoanStatus estado) {
         switch (estado) {
             case APROBADO:
@@ -153,12 +147,12 @@ public class Prestamo {
         return "Prestamo: " +
                 "\nId del prestamo: " + id +
                 "\nNumero de cliente: " + dniTitular +
-                "\nMonto total: " + monto +
+                "\nMonto: " + monto +
                 "\nMoneda: " + moneda +
-                "\nMonto con Interes " + montoConInteres +
+                //"\nMonto con Interes " + montoConInteres +
                 "\nPlazo en meses: " + plazoMeses +
-                "\nFecha de solicitud: " + solicitudFecha +
-                "\nFecha de aprovacion: " + aprovacionFecha +
-                "\nEstado: " + loanStatus;
+                "\nFecha de solicitud: " + fechaSolicitud +
+                "\nEstado: " + loanStatus +
+                "\nMensaje: " + mensaje;
     }
 }

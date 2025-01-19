@@ -34,7 +34,7 @@ public class PrestamoValidator {
     }
 
     private void validateDni(PrestamoDto prestamoDto) {
-        long dni = prestamoDto.getDniTitular();
+        long dni = prestamoDto.getNumeroCliente();
         if (dni <= 0) {
             throw new IllegalArgumentException("El DNI no puede ser nulo o cero.");
         }

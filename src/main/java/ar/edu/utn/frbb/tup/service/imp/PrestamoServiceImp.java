@@ -1,8 +1,7 @@
 package ar.edu.utn.frbb.tup.service.imp;
 
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
-import ar.edu.utn.frbb.tup.model.Cliente;
-import ar.edu.utn.frbb.tup.model.Prestamo;
+import ar.edu.utn.frbb.tup.model.*;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
@@ -19,54 +18,48 @@ import ar.edu.utn.frbb.tup.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PrestamoServiceImp implements PrestamoService {
-    PrestamoDao prestamoDao;
-    @Autowired
-    ClienteService clienteService;
-    @Autowired
-    CuentaService cuentaService;
-    @Autowired
-    CreditScoreService creditScoreService;
+    @Autowired PrestamoDao prestamoDao;
+    @Autowired ClienteService clienteService;
+    @Autowired CuentaService cuentaService;
+    @Autowired CreditScoreService creditScoreService;
 
     public PrestamoServiceImp(PrestamoDao prestamoDao) {
         this.prestamoDao = prestamoDao;
     }
 
     //solicitar prestamo
-    public Prestamo darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
-        System.out.println("Solicitando préstamo para el cliente con DNI: " + prestamoDto.getDniTitular());
-        Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getDniTitular());
-        if (cliente == null || !cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
-            throw new CuentaNoExisteException("El cliente no tiene una cuenta en la moneda solicitada.");
+    public PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
+        Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
+        if (cliente == null) {
+            throw new ClientNoExisteException("EL cliente con DNI: " + prestamoDto.getNumeroCliente() + " no existe.");
+        }
+        if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
+            throw new CuentaNoExisteException("El cliente " + prestamoDto.getNumeroCliente() + " no tiene cuneta en esa moenda.");
         }
         creditScoreService.validarScore(cliente);
         int score = creditScoreService.calcularScore(cliente.getPrestamos());
-        System.out.println("Puntaje calculado para el préstamo: " + score);
         Prestamo prestamo = new Prestamo(prestamoDto, score);
-        System.out.println("Préstamo creado con ID: " + prestamo.getId());
-        long id = prestamo.getId();
-        while (prestamoDao.findPrestamo(id) != null) {
-            id = prestamo.getId();
-        }
-        prestamo.setId(id);
 
-        if (prestamoDao.findPrestamo(prestamo.getId()) != null) {
-            throw new PrestamoNoExisteException("Prestamo no encontrado");
-        }
         double montoConInteres = calcularInteres(prestamoDto);
         prestamo.setMontoConInteres(montoConInteres);
         prestamoDao.savePrestamo(prestamo);
 
-        if (prestamo.getLoanStatus() == LoanStatus.APROBADO) {
-            cuentaService.actualizarBalance(prestamo);
+        LoanStatus estado = prestamo.getLoanStatus();
+        String mensaje = prestamo.devolverMensaje(estado);
+        List<PlanPago> planPagos = prestamo.getPlanDePagos();
+        if (estado == LoanStatus.APROBADO) {
+            planPagos = prestamo.getPlanDePagos();
+        } else if (estado == LoanStatus.RECHAZADO) {
+            planPagos = null;
         }
+
         clienteService.agregarPrestamo(prestamo, prestamo.getDniTitular());
-        return prestamo;
+        PrestamoDetalle respuesta = new PrestamoDetalle(estado, mensaje, planPagos);
+        return respuesta;
     }
 
     //busca todos los prestamos

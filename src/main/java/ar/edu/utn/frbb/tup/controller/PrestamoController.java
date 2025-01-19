@@ -3,6 +3,8 @@ package ar.edu.utn.frbb.tup.controller;
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.controller.validator.PrestamoValidator;
 import ar.edu.utn.frbb.tup.model.Prestamo;
+import ar.edu.utn.frbb.tup.model.PrestamoDetalle;
+import ar.edu.utn.frbb.tup.model.PrestamoRespuesta;
 import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
@@ -26,7 +28,7 @@ public class PrestamoController {
     private PrestamoValidator prestamoValidator;
 
     @PostMapping
-    public Prestamo crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, TipoMonedaNoSoportada, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
+    public PrestamoDetalle crearPrestamo(@RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, TipoMonedaNoSoportada, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
         prestamoValidator.validatePrestamo(prestamoDto);
         return prestamoService.darAltaPrestamo(prestamoDto);
     }
@@ -44,10 +46,10 @@ public class PrestamoController {
     }
 
     //busca prestamo por dni de cliente
-    @GetMapping("/cliente/{dni}")
-    public List<Prestamo> obtenerPrestamosPorCliente(@PathVariable long dni) throws ClientNoExisteException, PrestamoNoExisteException {
-        return prestamoService.buscarPrestamosPorCliente(dni);
-    }
+//    @GetMapping("/cliente/{dni}")
+//    public Prestamo obtenerPrestamosPorCliente(@PathVariable long dni) throws ClientNoExisteException, PrestamoNoExisteException {
+//        return prestamoService.buscarPrestamosPorCliente(dni);
+//    }
 
     //actualizar
     @PutMapping("/{id}")

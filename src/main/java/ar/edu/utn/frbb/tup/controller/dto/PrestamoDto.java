@@ -1,17 +1,17 @@
 package ar.edu.utn.frbb.tup.controller.dto;
 
 public class PrestamoDto {
-    private long dniTitular;
+    private long numeroCliente;
     private double montoPrestamo;
     private String tipoMoneda;
     private int plazoMeses;
 
     //getters y setters
-    public long getDniTitular() {
-        return dniTitular;
+    public long getNumeroCliente() {
+        return numeroCliente;
     }
-    public void setDniTitular(long dniTitular) {
-        this.dniTitular = dniTitular;
+    public void setNumeroCliente(long numeroCliente) {
+        this.numeroCliente = numeroCliente;
     }
 
     public Integer getPlazoMeses() {
@@ -34,5 +34,4 @@ public class PrestamoDto {
     public void setTipoMoneda(String tipoMoneda) {
         this.tipoMoneda = tipoMoneda;
     }
-
 }
