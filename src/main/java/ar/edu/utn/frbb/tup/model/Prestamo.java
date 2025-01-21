@@ -4,7 +4,6 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,30 +13,45 @@ public class Prestamo {
     private long id;
     private long dniTitular;
     private double monto;
-    private double montoConInteres;
-    private TipoMoneda moneda; //lo marca como string
+    private double montoConInteres; //monto total
+    private TipoMoneda moneda;
     private int plazoMeses;
-    private LocalDate fechaSolicitud;
     private LoanStatus loanStatus; //lo marca como string
     private String mensaje;
     private List<PlanPago> planDePagos;
 
+    //nuevos
+    private double montoTotalPagado;
+    private double saldoRestante;
+    private int pagosRealizados;
+    private final double tasaInteres;
+
     //constructores
     public Prestamo() {
         this.id = generarIdAleatorio();
-        this.fechaSolicitud = LocalDate.now();
         this.planDePagos = new ArrayList<>();
+        this.tasaInteres = 0.40;
     }
 
     public Prestamo(PrestamoDto prestamoDto, int score) {
         this.id = generarIdAleatorio();
         this.dniTitular = prestamoDto.getNumeroCliente();
         this.monto = prestamoDto.getMontoPrestamo();
+        this.tasaInteres = 0.40;
         this.moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
         this.plazoMeses = prestamoDto.getPlazoMeses();
         this.loanStatus = score >= 700 ? LoanStatus.APROBADO : LoanStatus.RECHAZADO;
         this.mensaje = devolverMensaje(this.loanStatus);
         this.planDePagos = calcularPlanPagos();
+    }
+
+    public Prestamo(long id, double monto, double montoConInteres, int plazoMeses, List<PlanPago> planDePagos) {
+        this.id = id;
+        this.monto = monto;
+        this.montoConInteres = montoConInteres;
+        this.tasaInteres = 0.40;
+        this.plazoMeses = plazoMeses;
+        this.planDePagos = planDePagos;
     }
 
     // getters & setters
@@ -67,14 +81,6 @@ public class Prestamo {
     }
     public void setMontoConInteres(double montoConInteres) {
         this.montoConInteres = montoConInteres;
-    }
-
-
-    public LocalDate getFechaSolicitud() {
-        return fechaSolicitud;
-    }
-    public void setFechaSolicitud(LocalDate fechaSolicitud) {
-        this.fechaSolicitud = fechaSolicitud;
     }
 
     public int getPlazoMeses() {
@@ -113,9 +119,38 @@ public class Prestamo {
         this.mensaje = mensaje;
     }
 
+    public double getSaldoRestante() {
+        return saldoRestante;
+    }
+    public void setSaldoRestante(double saldoRestante) {
+        this.saldoRestante = saldoRestante;
+    }
+
+    public int getPagosRealizados() {
+        return pagosRealizados;
+    }
+    public void setPagosRealizados(int pagosRealizados) {
+        this.pagosRealizados = pagosRealizados;
+    }
+
+    public double getTasaInteres() {
+        return tasaInteres;
+    }
+
+    public double getMontoTotalPagado() {
+        return montoTotalPagado;
+    }
+    public void setMontoTotalPagado(double montoTotalPagado) {
+        this.montoTotalPagado = montoTotalPagado;
+    }
+
     //otros metodos
     private long generarIdAleatorio() {
         return Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
+    }
+
+    public void incrementarPagosRealizados() {
+        this.pagosRealizados++;
     }
 
     public String devolverMensaje(LoanStatus estado) {
@@ -142,6 +177,18 @@ public class Prestamo {
         return cuotas;
     }
 
+    public void agregarPago(PlanPago pago) {
+        planDePagos.add(pago);
+        this.pagosRealizados++;
+        this.saldoRestante -= pago.getMonto();
+        calcularMontoConInteres();
+    }
+
+    public void calcularMontoConInteres() {
+        // Se calcula el monto total con la tasa de interés almacenada en el atributo tasaInteres
+        this.montoConInteres = monto + (monto * this.tasaInteres / 100);  // Dividido entre 100 para que sea un porcentaje
+    }
+
     @Override
     public String toString() {
         return "Prestamo: " +
@@ -151,8 +198,9 @@ public class Prestamo {
                 "\nMoneda: " + moneda +
                 //"\nMonto con Interes " + montoConInteres +
                 "\nPlazo en meses: " + plazoMeses +
-                "\nFecha de solicitud: " + fechaSolicitud +
                 "\nEstado: " + loanStatus +
-                "\nMensaje: " + mensaje;
+                "\nMensaje: " + mensaje +
+                "\nSaldo restante: " + saldoRestante +
+                "\nPagos realizados: " + pagosRealizados;
     }
 }

@@ -4,9 +4,13 @@ import java.util.List;
 
 public class PrestamoRespuesta {
     private long numeroCliente;
-    private List<PrestamoDetalle> prestamos;
+    private List<PrestamoResume> prestamos;
 
-    public PrestamoRespuesta(long numeroCliente, List<PrestamoDetalle> prestamos) {
+    public PrestamoRespuesta() {
+
+    }
+
+    public PrestamoRespuesta(long numeroCliente, List<PrestamoResume> prestamos) {
         this.numeroCliente = numeroCliente;
         this.prestamos = prestamos;
     }
@@ -14,7 +18,13 @@ public class PrestamoRespuesta {
     public long getNumeroCliente() {
         return numeroCliente;
     }
-    public List<PrestamoDetalle> getPrestamos() {
+    public void setNumeroCliente(long numeroCliente) {
+        this.numeroCliente = numeroCliente;
+    }
+    public List<PrestamoResume> getPrestamoResume() {
         return prestamos;
+    }
+    public void setPrestamoResume(List<PrestamoResume> prestamos) {
+        this.prestamos = prestamos;
     }
 }

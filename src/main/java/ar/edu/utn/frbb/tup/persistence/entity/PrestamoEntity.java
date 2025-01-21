@@ -14,7 +14,6 @@ public class PrestamoEntity extends BaseEntity {
     private final long numeroCliente;
     private final double monto;
     private final String tipoMoneda;
-    private final LocalDate fechaSolicitud;
     private final int plazoMeses;
     private String estado;
     //private String mensaje;
@@ -27,7 +26,6 @@ public class PrestamoEntity extends BaseEntity {
         this.monto = prestamo.getMonto();
         this.tipoMoneda = prestamo.getMoneda() != null ? prestamo.getMoneda().getDescripcion() : null;
         this.plazoMeses = prestamo.getPlazoMeses();
-        this.fechaSolicitud = prestamo.getFechaSolicitud();
         this.estado = prestamo.getLoanStatus() != null ? prestamo.getLoanStatus().getDescripcion() : null;
         if (prestamo.getPlanDePagos() != null && !prestamo.getPlanDePagos().isEmpty()) {
             for (PlanPago pago : prestamo.getPlanDePagos()) {
@@ -43,7 +41,6 @@ public class PrestamoEntity extends BaseEntity {
         prestamo.setMonto(this.monto);
         prestamo.setMoneda(TipoMoneda.fromString(this.tipoMoneda));
         prestamo.setPlazoMeses(this.plazoMeses);
-        prestamo.setFechaSolicitud(this.fechaSolicitud);
         prestamo.setLoanStatus(LoanStatus.fromString(this.estado));
         prestamo.setPlanDePagos(this.planPagos);
         return prestamo;
@@ -60,10 +57,6 @@ public class PrestamoEntity extends BaseEntity {
 
     public String getTipoMoneda() {
         return tipoMoneda;
-    }
-
-    public LocalDate getFechaSolicitud() {
-        return fechaSolicitud;
     }
 
     public int getPlazoMeses() {
