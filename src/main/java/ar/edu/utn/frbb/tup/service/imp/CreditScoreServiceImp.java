@@ -21,8 +21,6 @@ public class CreditScoreServiceImp implements CreditScoreService {
         for (Prestamo prestamo : prestamos) {
             if (prestamo.getLoanStatus().equals(LoanStatus.APROBADO)) {
                 score += 10;
-            } else if (prestamo.getLoanStatus().equals(LoanStatus.RECHAZADO)) {
-                score -= 20;
             }
         }
         return Math.max(MIN_SCORE, Math.min(score, MAX_SCORE));

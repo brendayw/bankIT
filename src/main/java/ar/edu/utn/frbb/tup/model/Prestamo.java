@@ -13,7 +13,7 @@ public class Prestamo {
     private long id;
     private long dniTitular;
     private double monto;
-    private double montoConInteres; //monto total
+    //private double montoConInteres; //monto total
     private TipoMoneda moneda;
     private int plazoMeses;
     private LoanStatus loanStatus; //lo marca como string
@@ -42,13 +42,12 @@ public class Prestamo {
         this.plazoMeses = prestamoDto.getPlazoMeses();
         this.loanStatus = score >= 700 ? LoanStatus.APROBADO : LoanStatus.RECHAZADO;
         this.mensaje = devolverMensaje(this.loanStatus);
-        this.planDePagos = calcularPlanPagos();
     }
 
-    public Prestamo(long id, double monto, double montoConInteres, int plazoMeses, List<PlanPago> planDePagos) {
+    public Prestamo(long id, double monto, /*double montoConInteres,*/ int plazoMeses, List<PlanPago> planDePagos) {
         this.id = id;
         this.monto = monto;
-        this.montoConInteres = montoConInteres;
+        //this.montoConInteres = calcularMontoConInteres();
         this.tasaInteres = 0.40;
         this.plazoMeses = plazoMeses;
         this.planDePagos = planDePagos;
@@ -76,12 +75,12 @@ public class Prestamo {
         this.monto = monto;
     }
 
-    public double getMontoConInteres() {
-        return montoConInteres;
-    }
-    public void setMontoConInteres(double montoConInteres) {
-        this.montoConInteres = montoConInteres;
-    }
+//    public double getMontoConInteres() {
+//        return montoConInteres;
+//    }
+//    public void setMontoConInteres(double montoConInteres) {
+//        this.montoConInteres = montoConInteres;
+//    }
 
     public int getPlazoMeses() {
         return plazoMeses;
@@ -156,7 +155,7 @@ public class Prestamo {
     public String devolverMensaje(LoanStatus estado) {
         switch (estado) {
             case APROBADO:
-                mensaje = "El préstamo fue aprobado, pronto será desembolsado.";
+                mensaje = "El préstamo fue aprobado.";
                 break;
             case RECHAZADO:
                 mensaje = "El préstamo ha sido rechazado debido a una calificación crediticia insuficiente";
@@ -168,26 +167,16 @@ public class Prestamo {
         return mensaje;
     }
 
-    public List<PlanPago> calcularPlanPagos() {
-        List<PlanPago> cuotas = new ArrayList<>();
-        double montoCuota = this.monto / this.plazoMeses;
-        for (int i = 1; i <= this.plazoMeses; i++) {
-            cuotas.add(new PlanPago(i, montoCuota));
-        }
-        return cuotas;
-    }
+//    public void agregarPago(PlanPago pago) {
+//        planDePagos.add(pago);
+//        this.pagosRealizados++;
+//        this.saldoRestante -= pago.getMonto();
+//        calcularMontoConInteres();
+//    }
 
-    public void agregarPago(PlanPago pago) {
-        planDePagos.add(pago);
-        this.pagosRealizados++;
-        this.saldoRestante -= pago.getMonto();
-        calcularMontoConInteres();
-    }
-
-    public void calcularMontoConInteres() {
-        // Se calcula el monto total con la tasa de interés almacenada en el atributo tasaInteres
-        this.montoConInteres = monto + (monto * this.tasaInteres / 100);  // Dividido entre 100 para que sea un porcentaje
-    }
+//    public double calcularMontoConInteres() {
+//        return this.montoConInteres = monto + (monto * this.tasaInteres / 100); // Dividido entre 100 para que sea un porcentaje
+//    }
 
     @Override
     public String toString() {

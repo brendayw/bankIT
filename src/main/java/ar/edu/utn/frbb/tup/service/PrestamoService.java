@@ -23,10 +23,8 @@ public interface PrestamoService {
     Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto;
     double calcularInteres(Prestamo prestamo) throws CampoIncorrecto;
     //int calcularPagosRealizados(Prestamo prestamo);
-    double calcularCuotaMensual(double montoPrestamo, double tasaInteresAnual, int plazoMeses);
+    //double calcularCuotaMensual(double montoPrestamo, double tasaInteresAnual, int plazoMeses);
     void planPagos(Prestamo prestamo);
-    double calcularSaldoRestante(double montoTotal, double montoCuota, int pagosRealizados);
-    //double calcularSaldoRestante(double montoConInteres, double cuotaMensual, int pagosRealizados);
-    //PrestamoRespuesta realizarPago(long id) throws PrestamoNoExisteException;
-    //double calcularSaldoRestante(Prestamo prestamo);
+    //double calcularSaldoRestante(double montoTotal, double montoCuota, int pagosRealizados);
+    double calcularSaldoRestante(Prestamo prestamo);
 }
