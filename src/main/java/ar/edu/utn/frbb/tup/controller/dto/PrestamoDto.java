@@ -34,4 +34,13 @@ public class PrestamoDto {
     public void setTipoMoneda(String tipoMoneda) {
         this.tipoMoneda = tipoMoneda;
     }
+
+    @Override
+    public String toString() {
+        return "\nPrestamoDto{" +
+                "\nnumeroCliente=" + numeroCliente +
+                "\nmontoPrestamo=" + montoPrestamo +
+                "\nplazoMeses=" + plazoMeses +
+                "\ntipoMoneda='" + tipoMoneda;
+    }
 }

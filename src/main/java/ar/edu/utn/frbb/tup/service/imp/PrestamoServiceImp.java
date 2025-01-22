@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PrestamoServiceImp implements PrestamoService {
@@ -32,7 +33,7 @@ public class PrestamoServiceImp implements PrestamoService {
         this.prestamoDao = prestamoDao;
     }
 
-    //solicitar prestamo -> OK
+    //POST - solicitar prestamo -> OK
     public PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
         Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
         if (cliente == null) {
@@ -47,9 +48,13 @@ public class PrestamoServiceImp implements PrestamoService {
         Prestamo prestamo = new Prestamo(prestamoDto, score);
         double montoConInteres = calcularInteres(prestamo);
         prestamo.setMonto(montoConInteres);
-        prestamoDto.setMontoPrestamo(montoConInteres); //guarda monto del prestamo + interes en el dto
+        prestamo.setSaldoRestante(calcularSaldoRestante(prestamo));
+        System.out.print("saldo restante al dar de alta: " + prestamo.getSaldoRestante());
+
+        //prestamoDto.setMontoPrestamo(montoConInteres); //guarda monto del prestamo + interes en el dto
         planPagos(prestamo);
         prestamoDao.savePrestamo(prestamo);
+
         System.out.println("ID del prestamo: " + prestamo.getId());
 
         LoanStatus estado = prestamo.getLoanStatus();
@@ -66,12 +71,12 @@ public class PrestamoServiceImp implements PrestamoService {
         return new PrestamoDetalle(estado, mensaje, planPagos);
     }
 
-    //busca todos los prestamos
+    //GET - busca todos los prestamos
     public List<Prestamo> buscarPrestamos() {
         return prestamoDao.findAll();
     }
 
-    //busca prestamo por id de prestamo
+    //GET - busca prestamo por id de prestamo - OK
     public Prestamo buscarPrestamoPorId(long id) throws PrestamoNoExisteException {
         Prestamo prestamo = prestamoDao.findPrestamo(id);
         if (prestamo == null) {
@@ -80,7 +85,7 @@ public class PrestamoServiceImp implements PrestamoService {
         return prestamo;
     }
 
-    //get -> no devuelve el monto bien
+    //GET -> no devuelve el monto bien
     public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException {
         PrestamoRespuesta prestamoRespuesta = new PrestamoRespuesta();
 
@@ -95,96 +100,84 @@ public class PrestamoServiceImp implements PrestamoService {
         return prestamoRespuesta;
     }
 
+    //PUT - paga -> creo que funciona bien
+    public void pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException {
+        List<Prestamo> prestamosDelCliente = prestamoDao.buscarPrestamoPorCliente(prestamoDto.getNumeroCliente());
+        Prestamo pagar = null;
+
+        for (Prestamo prestamo : prestamosDelCliente) {
+
+            if (prestamo.getId() == id && prestamo.getLoanStatus() == LoanStatus.APROBADO) {
+                pagar = prestamo;
+                break;
+            }
+        }
+
+        if (pagar == null) {
+            throw new PrestamoNoExisteException("No se encontró ningún préstamo.");
+        }
+
+        List<PlanPago> planPagos = pagar.getPlanDePagos();
+        if (planPagos == null || planPagos.isEmpty()) {
+            throw new IllegalArgumentException("No hay cuotas para pagar.");
+        }
+
+        //calcularSaldoRestante(pagar); //calcula el saldo restante
+        System.out.println("saldo restante: " + pagar.getSaldoRestante());
+        pagar.setSaldoRestante(calcularSaldoRestante(pagar));
+        System.out.println("saldo restante: " + pagar.getSaldoRestante());
+
+        double montoCuota = pagar.getMonto() / pagar.getPlazoMeses();  // Asegúrate de que la cuota sea el monto dividido entre los meses
+        System.out.println("Monto de la cuota a pagar: " + montoCuota);
+
+        Cliente cliente = clienteService.buscarClientePorDni(pagar.getDniTitular());
+        if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
+            throw new CuentaNoExisteException("El cliente no tiene cuentas en esa moneda.");
+        }
+
+        if (pagar.getSaldoRestante() <= 0) {
+            throw new IllegalStateException("El préstamo ya está completamente pagado.");
+        }
+
+        pagar.setSaldoRestante(pagar.getSaldoRestante() - montoCuota);
+
+        System.out.println("saldo restante: " + pagar.getSaldoRestante());
+
+        pagar.incrementarPagosRealizados();
+        System.out.print(pagar.getPagosRealizados());
+        planPagos.remove(0);
+        pagar.setPlanDePagos(planPagos);
+
+        prestamoDao.update(pagar);
+        System.out.println("Pago realizado. Restante: " + pagar.getSaldoRestante());
+        prestamoDao.buscarPrestamoPorCliente(pagar.getDniTitular());
+        System.out.println(pagar);
+
+
+    }
+
     //no devuelve monto con interes bien
     public List<PrestamoResume> prestamoResumes(List<Prestamo> prestamos) {
         List<PrestamoResume> listado = new ArrayList<>();
 
         for (Prestamo prestamo : prestamos) {
             PrestamoResume datos = new PrestamoResume();
-            double montoConInteres = prestamo.getMonto();
-            System.out.println("Monto con Interés de este prestamo: " + montoConInteres);
-
-            int plazoMeses = prestamo.getPlazoMeses();
-            double saldoPagarTotal = prestamo.getMonto() * prestamo.getPlazoMeses();
             int pagosRealizados = prestamo.getPlazoMeses() - prestamo.getPlanDePagos().size();
-
-            datos.setMontoConInteres(montoConInteres);
-            datos.setPlazoMeses(plazoMeses);
+            datos.setMonto(prestamo.getMonto());
+            datos.setPlazoMeses(prestamo.getPlazoMeses());
             datos.setPagosRealizados(pagosRealizados);
-            datos.setSaldoRestante(calcularSaldoRestante(prestamo));
+
+            double saldoRestante = prestamo.getSaldoRestante();
+            System.out.print("Saldo restante de list resumes: " + saldoRestante);
+            datos.setSaldoRestante(saldoRestante);
 
             listado.add(datos);
+            System.out.print("Impresion de resumes: " + listado);
         }
         return listado;
     }
 
-    //paga -> creo que funciona bien
-    public void pagarCuota(PrestamoDto prestamoDto) throws PrestamoNoExisteException {
-        List<Prestamo> prestamosDelCliente = prestamoDao.buscarPrestamoPorCliente(prestamoDto.getNumeroCliente());
-        Prestamo pagar = null;
-
-        for (Prestamo prestamo : prestamosDelCliente) {
-            if (prestamo.getMonto() == prestamoDto.getMontoPrestamo()
-                    && prestamoDto.getPlazoMeses() == prestamo.getPlazoMeses()
-                    && prestamo.getMoneda() == TipoMoneda.fromString(prestamoDto.getTipoMoneda()) ) {
-                pagar = prestamo;
-                break;
-            }
-        }
-        if (pagar == null) {
-            throw new PrestamoNoExisteException("No se encontro ningun prestamo.");
-        }
-        List<PlanPago> planPagos = pagar.getPlanDePagos();
-        if (planPagos == null || planPagos.isEmpty()) {
-            throw new IllegalArgumentException("No hay cuotas para pagar.");
-        }
-
-        double montoCuota = pagar.getMonto();
-        Cliente cliente = clienteService.buscarClientePorDni(pagar.getDniTitular());
-        if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
-            throw new CuentaNoExisteException("El cliente no tiene cuentas en esa moneda.");
-        }
-        pagar.incrementarPagosRealizados();
-        planPagos.remove(0);
-        pagar.setPlanDePagos(planPagos);
-        prestamoDao.update(pagar);
-    }
-
-
-    //buscar prestamo por cliente
-//    public PrestamoRespuesta buscarPrestamosPorCliente(long dni) throws ClientNoExisteException, PrestamoNoExisteException {
-//        Cliente cliente = clienteService.buscarClientePorDni(dni);
-//        if (cliente == null) {
-//            throw new ClientNoExisteException("El cliente con DNI: " + dni + " no existe.");
-//        }
-//        Set<Prestamo> prestamos = cliente.getPrestamos();
-//        if (prestamos == null || prestamos.isEmpty()) {
-//            throw new PrestamoNoExisteException("El cliente con DNI: " + dni + " no tiene prestamos solicitados.");
-//        }
-//
-//        List<PrestamoResume> prestamosResumes = new ArrayList<>();
-//        for (Prestamo prestamo : prestamos) {
-//            prestamo.calcularMontoConInteres();
-//            double montoConInteres = prestamo.getMontoConInteres();
-//            int plazoMeses = prestamo.getPlazoMeses();
-//            int pagosRealizados = calcularPagosRealizados(prestamo);
-//            double tasaInteresAnual = 0.40;
-//            double cuotaMensual = calcularCuotaMensual(montoConInteres, tasaInteresAnual, plazoMeses);
-//            double saldoRestante = calcularSaldoRestante(prestamo);
-//
-//            if (saldoRestante == 0) {
-//                prestamo.setLoanStatus(LoanStatus.CERRADO);  // Cambiar estado del préstamo a cerrado si está saldado
-//            }
-//
-//            PrestamoResume resume = new PrestamoResume(montoConInteres, plazoMeses, pagosRealizados, saldoRestante);
-//            prestamosResumes.add(resume);
-//
-//        }
-//        PrestamoRespuesta respuesta = new PrestamoRespuesta(cliente.getDni(), prestamosResumes);
-//        return respuesta;
-//    }
-
-    //actualizar datos -> no se
+    //PUT - actualizar datos -> no se
     public Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto /*double monto, LoanStatus estado*/) throws PrestamoNoExisteException, CampoIncorrecto {
         System.out.println("Iniciando la actualización del préstamo con ID: " + id);
 
@@ -245,7 +238,7 @@ public class PrestamoServiceImp implements PrestamoService {
 //        return new PrestamoRespuesta(prestamo.getDniTitular(), prestamosResumes);
 //    }
 
-    //delete
+    //DELETE -
     public Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto {
         Prestamo prestamo = prestamoDao.findPrestamo(id);
         if (prestamo == null) {

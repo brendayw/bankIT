@@ -74,9 +74,9 @@ public class PrestamoController {
         if (prestamo == null) {
             throw new PrestamoNoExisteException("Prestamo no encontrado.");
         }
-
         prestamoDto.setNumeroCliente(prestamo.getDniTitular());
-        prestamoService.pagarCuota(prestamoDto);
+        prestamoService.pagarCuota(prestamoDto, prestamo.getId());
+
         Prestamo prestamoActualizado = prestamoService.buscarPrestamoPorId(id);
         List<PrestamoResume> resumen = prestamoService.prestamoResumes(Collections.singletonList(prestamoActualizado));
         return new PrestamoRespuesta(prestamoActualizado.getDniTitular(), resumen);

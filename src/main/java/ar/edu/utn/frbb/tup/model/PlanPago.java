@@ -5,12 +5,12 @@ import java.util.Map;
 
 public class PlanPago {
     private int cuotaNro;
-    private double monto;
+    private double montoCuota;
 
     // Constructor
-    public PlanPago(int cuotaNro, double monto) {
+    public PlanPago(int cuotaNro, double montoCuota) {
         this.cuotaNro = cuotaNro;
-        this.monto = monto;
+        this.montoCuota = montoCuota;
     }
 
     // Getters y setters
@@ -21,18 +21,24 @@ public class PlanPago {
         this.cuotaNro = cuotaNro;
     }
 
-    public double getMonto() {
-        return monto;
+    public double getMontoCuota() {
+        return montoCuota;
     }
-    public void setMonto(double monto) {
-        this.monto = monto;
+    public void setMontoCuota(double montoCuota) {
+        this.montoCuota = montoCuota;
     }
 
     //metodos
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("cuotaNro", cuotaNro);
-        map.put("monto", monto);
+        map.put("monto", montoCuota);
         return map;
+    }
+
+    public String toString() {
+        return "Plan de pago: " +
+                "\ncuota numero: " + cuotaNro +
+                "\nmonto cuota: " + montoCuota;
     }
 }

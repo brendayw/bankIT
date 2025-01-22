@@ -167,16 +167,34 @@ public class Prestamo {
         return mensaje;
     }
 
-//    public void agregarPago(PlanPago pago) {
-//        planDePagos.add(pago);
-//        this.pagosRealizados++;
-//        this.saldoRestante -= pago.getMonto();
-//        calcularMontoConInteres();
-//    }
+    public void agregarPago(PlanPago pago) {
+        planDePagos.add(pago);
+        this.pagosRealizados++;
+        this.saldoRestante -= pago.getMontoCuota();
+
+    }
 
 //    public double calcularMontoConInteres() {
-//        return this.montoConInteres = monto + (monto * this.tasaInteres / 100); // Dividido entre 100 para que sea un porcentaje
+//        return this.monto = monto + (monto * this.tasaInteres / 100); // Dividido entre 100 para que sea un porcentaje
 //    }
+
+    public void actualizarSaldoRestante() {
+        double montoCuota = this.monto / this.plazoMeses;
+        this.saldoRestante = this.monto - montoCuota * this.pagosRealizados;
+
+        // Si el saldo restante es menor a cero, lo establecemos en 0
+        if (this.saldoRestante < 0) {
+            this.saldoRestante = 0;
+        }
+    }
+
+    // Método para realizar un pago y actualizar el saldo restante
+    public void realizarPago() {
+        if (this.saldoRestante > 0) {
+            this.pagosRealizados++;
+            actualizarSaldoRestante(); // Recalcula el saldo restante
+        }
+    }
 
     @Override
     public String toString() {
@@ -185,7 +203,6 @@ public class Prestamo {
                 "\nNumero de cliente: " + dniTitular +
                 "\nMonto: " + monto +
                 "\nMoneda: " + moneda +
-                //"\nMonto con Interes " + montoConInteres +
                 "\nPlazo en meses: " + plazoMeses +
                 "\nEstado: " + loanStatus +
                 "\nMensaje: " + mensaje +
