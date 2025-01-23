@@ -11,10 +11,11 @@ import java.util.Random;
 public class Prestamo {
     private long id;
     private long dniTitular;
-    private double monto;
+    private double montoSolicitado;
+    private double monto; //monto con interes calculado
     private TipoMoneda moneda;
     private int plazoMeses;
-    private LoanStatus loanStatus; //lo marca como string
+    private LoanStatus loanStatus;
     private String mensaje;
     private List<PlanPago> planDePagos;
 
@@ -33,6 +34,7 @@ public class Prestamo {
     public Prestamo(PrestamoDto prestamoDto, int score) {
         this.id = generarIdAleatorio();
         this.dniTitular = prestamoDto.getNumeroCliente();
+        this.montoSolicitado = prestamoDto.getMontoPrestamo();
         this.monto = prestamoDto.getMontoPrestamo();
         this.tasaInteres = 0.40;
         this.moneda = TipoMoneda.fromString(prestamoDto.getTipoMoneda());
@@ -49,7 +51,7 @@ public class Prestamo {
         this.planDePagos = planDePagos;
     }
 
-    // getters & setters
+    //getters & setters
     public long getId() {
         return id;
     }
@@ -62,6 +64,13 @@ public class Prestamo {
     }
     public void setDniTitular(long dniTitular) {
         this.dniTitular = dniTitular;
+    }
+
+    public double getMontoSolicitado() {
+        return montoSolicitado;
+    }
+    public void setMontoSolicitado(double montoSolicitado) {
+        this.montoSolicitado = montoSolicitado;
     }
 
     public double getMonto() {
@@ -130,10 +139,6 @@ public class Prestamo {
         return Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
     }
 
-    public void incrementarPagosRealizados() {
-        this.pagosRealizados++;
-    }
-
     public String devolverMensaje(LoanStatus estado) {
         switch (estado) {
             case APROBADO:
@@ -142,49 +147,14 @@ public class Prestamo {
             case RECHAZADO:
                 mensaje = "El préstamo ha sido rechazado debido a una calificación crediticia insuficiente";
                 break;
+            case CERRADO:
+                mensaje = "El préstamo ha sido saldado.";
+                break;
             default:
                 mensaje = "Estado desconocido del préstamo";
                 break;
         }
         return mensaje;
-    }
-
-    public void agregarPago(PlanPago pago) {
-        planDePagos.add(pago);
-        this.pagosRealizados++;
-        this.saldoRestante -= pago.getMontoCuota();
-
-    }
-
-//    public double calcularMontoConInteres() {
-//        return this.monto = monto + (monto * this.tasaInteres / 100); // Dividido entre 100 para que sea un porcentaje
-//    }
-
-    public double actualizarSaldoRestante() {
-        double montoCuota = this.monto / this.plazoMeses;
-        this.saldoRestante = this.monto - (montoCuota * this.pagosRealizados);
-
-        // Si el saldo restante es menor a cero, lo establecemos en 0
-        if (this.saldoRestante < 0) {
-            this.saldoRestante = 0;
-        }
-        return saldoRestante;
-    }
-
-    // Método para realizar un pago y actualizar el saldo restante
-    public void realizarPago(PlanPago pago) {
-        if (this.saldoRestante <= 0) {
-            throw new IllegalStateException("El préstamo ya está completamente pagado.");
-        }
-        if (!this.planDePagos.contains(pago)) {
-            throw new IllegalArgumentException("El plan de pago no corresponde.");
-        }
-        this.planDePagos.remove(pago);
-        this.pagosRealizados++;
-        this.saldoRestante -= pago.getMontoCuota();
-        if (this.saldoRestante < 0) {
-            this.saldoRestante = 0; // Asegura que nunca sea negativo
-        }
     }
 
     @Override

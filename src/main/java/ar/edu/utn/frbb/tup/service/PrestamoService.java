@@ -17,9 +17,5 @@ public interface PrestamoService {
     Prestamo buscarPrestamoPorId(long id) throws PrestamoNoExisteException;
     PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException;
     PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException;
-    Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto) throws PrestamoNoExisteException, CampoIncorrecto;
     Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto;
-    double calcularInteres(Prestamo prestamo) throws CampoIncorrecto;
-    void planPagos(Prestamo prestamo);
-    double calcularSaldoRestante(Prestamo prestamo);
 }

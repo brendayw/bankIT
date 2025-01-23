@@ -12,19 +12,20 @@ import java.util.List;
 public class PrestamoEntity extends BaseEntity {
     private final long id;
     private final long numeroCliente;
-    private final double monto;
+    private final double montoSolicitado;
+    private final double monto; // monto con interes
     private final String tipoMoneda;
     private final int plazoMeses;
     private String estado;
     private double saldoRestante;
     private int pagosRealizados;
-    //private String mensaje;
     private final List<PlanPago> planPagos = new ArrayList<>();
 
     public PrestamoEntity(Prestamo prestamo) {
         super(prestamo.getId());
         this.id = prestamo.getId();
         this.numeroCliente = prestamo.getDniTitular();
+        this.montoSolicitado = prestamo.getMontoSolicitado();
         this.monto = prestamo.getMonto();
         this.tipoMoneda = prestamo.getMoneda() != null ? prestamo.getMoneda().getDescripcion() : null;
         this.plazoMeses = prestamo.getPlazoMeses();
@@ -42,6 +43,7 @@ public class PrestamoEntity extends BaseEntity {
         Prestamo prestamo = new Prestamo();
         prestamo.setId(this.id);
         prestamo.setDniTitular(this.numeroCliente);
+        prestamo.setMontoSolicitado(this.montoSolicitado);
         prestamo.setMonto(this.monto);
         prestamo.setMoneda(TipoMoneda.fromString(this.tipoMoneda));
         prestamo.setPlazoMeses(this.plazoMeses);

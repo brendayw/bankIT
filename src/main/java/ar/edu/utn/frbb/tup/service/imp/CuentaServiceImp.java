@@ -27,46 +27,30 @@ public class CuentaServiceImp implements CuentaService {
     @Autowired
     ClienteService clienteService;
 
-    //Generar casos de test para darDeAltaCuenta
-    //    1 - cuenta existente
-    //    2 - cuenta no soportada
-    //    3 - cliente ya tiene cuenta de ese tipo
-    //    4 - cuenta creada exitosamente
-    public CuentaServiceImp(CuentaDao cuentaDao) {
+    public CuentaServiceImp(CuentaDao cuentaDao, ClienteService clienteService) {
         this.cuentaDao = cuentaDao;
+        this.clienteService = clienteService;
     }
 
     //agregar tipocuentayaexiste
+    @Override
     public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
         Cuenta cuenta = new Cuenta(cuentaDto);
-        long numeroCuenta = cuenta.getNumeroCuenta();
-        while (cuentaDao.find(numeroCuenta) != null) {
-            numeroCuenta = cuenta.getNumeroCuenta();
-        }
-        cuenta.setNumeroCuenta(numeroCuenta);
-        if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
-            throw new CuentaYaExisteException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
-        }
-        //Chequear cuentas soportadas por el banco CA$ CC$ CAU$S
-        if (!tipoCuentaEstaSoportada(cuenta)) {
-            throw new CuentaNoSoportadaException("El tipo de cuenta no es soportado.");
-        }
-        if (!tipoMonedaEstaSoportada(cuenta)) {
-            throw new TipoMonedaNoSoportada("El tipo de moneda no es soportado.");
-        }
+        validarCuentaUnica(cuenta);
+        validarTipoCuentaUnica(cuenta);
+        validarTipoCuenta(cuenta);
+        validarTipoMoneda(cuenta);
         clienteService.agregarCuenta(cuenta, cuenta.getDniTitular());
         cuentaDao.save(cuenta);
         return cuenta;
     }
 
+    @Override
     public Cuenta buscarCuentaPorId(long id) throws CuentaNoExisteException {
-        Cuenta cuenta = cuentaDao.find(id);
-        if (cuenta == null) {
-            throw new CuentaNoExisteException("La cuenta no existe.");
-        }
-        return cuenta;
+        return obtenerCuentaExistente(id);
     }
 
+    @Override
     public List<Cuenta> buscarCuentaPorCliente(long dni) throws ClientNoExisteException, CuentaNoExisteException {
         Cliente cliente = clienteService.buscarClientePorDni(dni);
         if (cliente == null) {
@@ -79,16 +63,15 @@ public class CuentaServiceImp implements CuentaService {
         return new ArrayList<>(cuentas);
     }
 
+    @Override
     public List<Cuenta> buscarCuentas() {
         return cuentaDao.findAll();
     }
 
     //actualiza balance y estado
+    @Override
     public Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException {
-        Cuenta cuenta = cuentaDao.find(id);
-        if (cuenta == null) {
-            throw new CuentaNoExisteException("La cuenta con ID: " + id + " no existe.");
-        }
+        Cuenta cuenta = obtenerCuentaExistente(id);
         if (nuevoBalance != 0.0) {
             cuenta.setBalance(nuevoBalance);
         }
@@ -100,37 +83,68 @@ public class CuentaServiceImp implements CuentaService {
     }
 
     //actualizar si el prestamo se aprueba
+    @Override
     public void actualizarBalance(Prestamo prestamo) throws CuentaNoExisteException {
-        long dniTitular = prestamo.getDniTitular();
-        Cuenta cuenta = cuentaDao.findByClienteYTipoMoneda(dniTitular, prestamo.getMoneda().toString());
+        Cuenta cuenta = cuentaDao.findByClienteYTipoMoneda(prestamo.getDniTitular(), prestamo.getMoneda().toString());
         if (cuenta == null) {
             throw new CuentaNoExisteException("La cuenta no existe.");
         }
-        double nuevoBalance = cuenta.getBalance() + prestamo.getMonto();
+        double nuevoBalance = cuenta.getBalance() + prestamo.getMontoSolicitado();
         cuenta.setBalance(nuevoBalance);
         cuentaDao.save(cuenta);
+        Cuenta cuentaActualizada = cuentaDao.findByClienteYTipoMoneda(prestamo.getDniTitular(), prestamo.getMoneda().toString());
     }
 
     //delete
+    @Override
     public Cuenta desactivarCuenta(long id) throws CuentaNoExisteException {
-        Cuenta cuenta = cuentaDao.find(id);
-        if (cuenta == null) {
-            throw new CuentaNoExisteException("La cuenta con ID: " + id + " no existe.");
-        }
+        Cuenta cuenta = obtenerCuentaExistente(id);
         cuenta.setEstado(false);
-        actulizarDatosCuenta(id, 0.0, false);
+        cuentaDao.update(cuenta);
         return cuenta;
     }
 
     //otro metodos
-    public boolean tipoCuentaEstaSoportada(Cuenta cuenta) {
-        boolean tipoCuentaSoportada;
-        tipoCuentaSoportada = cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE || cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO;
-        return tipoCuentaSoportada;
+    private void validarCuentaUnica(Cuenta cuenta) throws CuentaYaExisteException {
+        if (cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
+            throw new CuentaYaExisteException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
+        }
     }
-    public boolean tipoMonedaEstaSoportada(Cuenta cuenta) {
-        boolean tipoMonedaSoportada;
-        tipoMonedaSoportada = cuenta.getTipoMoneda() == TipoMoneda.DOLARES|| cuenta.getTipoMoneda() == TipoMoneda.PESOS;
-        return tipoMonedaSoportada;
+
+    private void validarTipoCuentaUnica(Cuenta cuenta) throws TipoCuentaYaExisteException {
+        List<Cuenta> cuentasCliente = cuentaDao.buscarCuentasByCliente(cuenta.getDniTitular());
+        for (Cuenta cuentas : cuentasCliente) {
+            if (cuentas.getTipoCuenta() == cuenta.getTipoCuenta() && cuentas.getTipoMoneda() == cuenta.getTipoMoneda()) {
+                throw new TipoCuentaYaExisteException("El cliente ya tiene una cuenta de tipo " + cuenta.getTipoCuenta() + " en " + cuenta.getTipoMoneda() + ".");
+            }
+        }
+    }
+
+    private void validarTipoCuenta(Cuenta cuenta) throws CuentaNoSoportadaException {
+        if (!tipoCuentaEstaSoportada(cuenta)) {
+            throw new CuentaNoSoportadaException("El tipo de cuenta no es soportado.");
+        }
+    }
+
+    private void validarTipoMoneda(Cuenta cuenta) throws TipoMonedaNoSoportada {
+        if (!tipoMonedaEstaSoportada(cuenta)) {
+            throw new TipoMonedaNoSoportada("El tipo de moneda no es soportado.");
+        }
+    }
+
+    private Cuenta obtenerCuentaExistente(long id) throws CuentaNoExisteException {
+        Cuenta cuenta = cuentaDao.find(id);
+        if (cuenta == null) {
+            throw new CuentaNoExisteException("La cuenta con ID: " + id + " no existe.");
+        }
+        return cuenta;
+    }
+
+    private boolean tipoCuentaEstaSoportada(Cuenta cuenta) {
+        return cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE || cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO;
+    }
+
+    private boolean tipoMonedaEstaSoportada(Cuenta cuenta) {
+        return cuenta.getTipoMoneda() == TipoMoneda.DOLARES || cuenta.getTipoMoneda() == TipoMoneda.PESOS;
     }
 }
