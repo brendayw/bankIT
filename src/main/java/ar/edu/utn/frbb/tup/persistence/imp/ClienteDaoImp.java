@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class ClienteDaoImp extends AbstractBaseDao implements ClienteDao {
@@ -46,8 +48,30 @@ public class ClienteDaoImp extends AbstractBaseDao implements ClienteDao {
 
     public List<Cliente> findAll() {
         List<Cliente> clientes = new ArrayList<>();
+
         for (Object object : getInMemoryDatabase().values()) {
-            clientes.add(((ClienteEntity) object).toCliente());
+            ClienteEntity clienteEntity = (ClienteEntity) object;
+            Cliente cliente = clienteEntity.toCliente();
+
+            Set<Cuenta> cuentasSet = new HashSet<>();
+            for (long cuentaId : clienteEntity.getCuentas()) {
+                Cuenta cuenta = cuentaDao.find(cuentaId);
+                if (cuenta != null) {
+                    cuentasSet.add(cuenta);
+                }
+            }
+            cliente.setCuentas(cuentasSet);
+
+            Set<Prestamo> prestamosSet = new HashSet<>();
+            for (long prestamoId : clienteEntity.getPrestamos()) {
+                Prestamo prestamo = prestamoDao.findPrestamo(prestamoId);
+                if (prestamo != null) {
+                    prestamosSet.add(prestamo);
+                }
+            }
+            cliente.setPrestamos(prestamosSet);
+
+            clientes.add(cliente);
         }
         return clientes;
     }

@@ -7,7 +7,9 @@ import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ClienteEntity extends BaseEntity {
     private final String tipoPersona;
@@ -18,8 +20,8 @@ public class ClienteEntity extends BaseEntity {
     private final LocalDate fechaAlta;
     private final LocalDate fechaNacimiento;
     private final String banco;
-    private List<Long> cuentas;
-    private List<Long> prestamos;
+    private Set<Long> cuentas;
+    private Set<Long> prestamos;
     private boolean activo;
 
     public ClienteEntity(Cliente cliente) {
@@ -32,8 +34,8 @@ public class ClienteEntity extends BaseEntity {
         this.fechaAlta = cliente.getFechaAlta();
         this.fechaNacimiento = cliente.getFechaNacimiento();
         this.banco = cliente.getBanco();
-        this.cuentas = new ArrayList<>();
-        this.prestamos = new ArrayList<>();
+        this.cuentas = new HashSet<>();
+        this.prestamos = new HashSet<>();
         this.activo = cliente.isActivo();
         if (cliente.getCuentas() != null && !cliente.getCuentas().isEmpty()) {
             for (Cuenta c: cliente.getCuentas()) {
@@ -60,5 +62,22 @@ public class ClienteEntity extends BaseEntity {
         cliente.setBanco(this.banco);
         cliente.setActivo(true);
         return cliente;
+    }
+
+    //getters y setters
+    public Set<Long> getCuentas() {
+        return cuentas;
+    }
+
+    public void setCuentas(Set<Long> cuentas) {
+        this.cuentas = cuentas;
+    }
+
+    public Set<Long> getPrestamos() {
+        return prestamos;
+    }
+
+    public void setPrestamos(Set<Long> prestamos) {
+        this.prestamos = prestamos;
     }
 }

@@ -92,7 +92,6 @@ public class CuentaServiceImp implements CuentaService {
         double nuevoBalance = cuenta.getBalance() + prestamo.getMontoSolicitado();
         cuenta.setBalance(nuevoBalance);
         cuentaDao.save(cuenta);
-        Cuenta cuentaActualizada = cuentaDao.findByClienteYTipoMoneda(prestamo.getDniTitular(), prestamo.getMoneda().toString());
     }
 
     //delete

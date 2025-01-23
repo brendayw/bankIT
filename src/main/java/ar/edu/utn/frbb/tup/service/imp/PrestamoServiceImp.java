@@ -141,7 +141,6 @@ public class PrestamoServiceImp implements PrestamoService {
     private Prestamo crearPrestamo(PrestamoDto prestamoDto, int score) {
         Prestamo prestamo = new Prestamo(prestamoDto, score);
         double montoSolicitado = prestamoDto.getMontoPrestamo();
-        System.out.println("monto prestamo dto" + prestamoDto.getMontoPrestamo());
         double montoConInteres = calcularInteres(prestamo);
         prestamo.setMontoSolicitado(montoSolicitado);
         prestamo.setMonto(montoConInteres);

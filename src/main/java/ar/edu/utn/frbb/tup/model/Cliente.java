@@ -62,8 +62,17 @@ public class Cliente extends Persona{
     public Set<Cuenta> getCuentas() {
         return cuentas;
     }
+
+    public void setCuentas(Set<Cuenta> cuentas) {
+        this.cuentas = cuentas;
+    }
+
     public Set<Prestamo> getPrestamos() {
         return prestamos;
+    }
+
+    public void setPrestamos(Set<Prestamo> prestamos) {
+        this.prestamos = prestamos;
     }
 
     //metodos
