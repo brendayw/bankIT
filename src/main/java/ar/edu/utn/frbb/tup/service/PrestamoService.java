@@ -15,16 +15,11 @@ public interface PrestamoService {
     PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto;
     List<Prestamo> buscarPrestamos();
     Prestamo buscarPrestamoPorId(long id) throws PrestamoNoExisteException;
+    PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException;
     PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException;
-    List<PrestamoResume> prestamoResumes(List<Prestamo> prestamos);
-    void pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException;
-    //PrestamoRespuesta buscarPrestamosPorCliente(long dni) throws ClientNoExisteException, PrestamoNoExisteException;
-    Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto/*, double monto, LoanStatus estado*/) throws PrestamoNoExisteException, CampoIncorrecto;
+    Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto) throws PrestamoNoExisteException, CampoIncorrecto;
     Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto;
     double calcularInteres(Prestamo prestamo) throws CampoIncorrecto;
-    //int calcularPagosRealizados(Prestamo prestamo);
-    //double calcularCuotaMensual(double montoPrestamo, double tasaInteresAnual, int plazoMeses);
     void planPagos(Prestamo prestamo);
-    //double calcularSaldoRestante(double montoTotal, double montoCuota, int pagosRealizados);
     double calcularSaldoRestante(Prestamo prestamo);
 }

@@ -50,13 +50,4 @@ public class PrestamoDaoImp extends AbstractBaseDao implements PrestamoDao {
         return prestamosDelCliente;
     }
 
-    //verificar
-    //agregar exception
-    public Prestamo update(Prestamo prestamo) {
-        Prestamo actualizado = findPrestamo(prestamo.getId());
-        if (actualizado != null) {
-            System.out.println("Datos actualizados.");
-        }
-        return actualizado;
-    }
 }

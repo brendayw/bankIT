@@ -16,6 +16,8 @@ public class PrestamoEntity extends BaseEntity {
     private final String tipoMoneda;
     private final int plazoMeses;
     private String estado;
+    private double saldoRestante;
+    private int pagosRealizados;
     //private String mensaje;
     private final List<PlanPago> planPagos = new ArrayList<>();
 
@@ -32,6 +34,8 @@ public class PrestamoEntity extends BaseEntity {
                 this.planPagos.add(pago);
             }
         }
+        this.saldoRestante = prestamo.getSaldoRestante();
+        this.pagosRealizados = prestamo.getPagosRealizados();
     }
 
     public Prestamo toPrestamo() {
@@ -43,6 +47,8 @@ public class PrestamoEntity extends BaseEntity {
         prestamo.setPlazoMeses(this.plazoMeses);
         prestamo.setLoanStatus(LoanStatus.fromString(this.estado));
         prestamo.setPlanDePagos(this.planPagos);
+        prestamo.setPagosRealizados(this.pagosRealizados);
+        prestamo.setSaldoRestante(this.saldoRestante);
         return prestamo;
     }
 
@@ -73,5 +79,19 @@ public class PrestamoEntity extends BaseEntity {
 
     public List<PlanPago> getPlanPagos() {
         return planPagos;
+    }
+
+    public double getSaldoRestante() {
+        return saldoRestante;
+    }
+    public void setSaldoRestante(double saldoRestante) {
+        this.saldoRestante = saldoRestante;
+    }
+
+    public int getPagosRealizados() {
+        return pagosRealizados;
+    }
+    public void setPagosRealizados(int pagosRealizados) {
+        this.pagosRealizados = pagosRealizados;
     }
 }

@@ -23,11 +23,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class PrestamoServiceImp implements PrestamoService {
-    @Autowired PrestamoDao prestamoDao;
-    @Autowired ClienteService clienteService;
+    @Autowired
+    PrestamoDao prestamoDao;
+    @Autowired
+    ClienteService clienteService;
     @Autowired
     CuentaService cuentaService;
-    @Autowired CreditScoreService creditScoreService;
+    @Autowired
+    CreditScoreService creditScoreService;
 
     public PrestamoServiceImp(PrestamoDao prestamoDao) {
         this.prestamoDao = prestamoDao;
@@ -49,13 +52,13 @@ public class PrestamoServiceImp implements PrestamoService {
         double montoConInteres = calcularInteres(prestamo);
         prestamo.setMonto(montoConInteres);
         prestamo.setSaldoRestante(calcularSaldoRestante(prestamo));
-        System.out.print("saldo restante al dar de alta: " + prestamo.getSaldoRestante());
+        System.out.print("\nsaldo restante al dar de alta: " + prestamo.getSaldoRestante());
 
         //prestamoDto.setMontoPrestamo(montoConInteres); //guarda monto del prestamo + interes en el dto
         planPagos(prestamo);
         prestamoDao.savePrestamo(prestamo);
 
-        System.out.println("ID del prestamo: " + prestamo.getId());
+        System.out.println("\nID del prestamo: " + prestamo.getId());
 
         LoanStatus estado = prestamo.getLoanStatus();
         String mensaje = prestamo.devolverMensaje(estado);
@@ -71,7 +74,7 @@ public class PrestamoServiceImp implements PrestamoService {
         return new PrestamoDetalle(estado, mensaje, planPagos);
     }
 
-    //GET - busca todos los prestamos
+    //GET - busca todos los prestamos - ok
     public List<Prestamo> buscarPrestamos() {
         return prestamoDao.findAll();
     }
@@ -85,100 +88,81 @@ public class PrestamoServiceImp implements PrestamoService {
         return prestamo;
     }
 
-    //GET -> no devuelve el monto bien
-    public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException {
-        PrestamoRespuesta prestamoRespuesta = new PrestamoRespuesta();
-
-        if (clienteService.buscarClientePorDni(numeroCliente) != null) {
-            List<Prestamo> prestamosDelCliente = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
-            if (prestamosDelCliente.isEmpty()) {
-                throw new PrestamoNoExisteException("El cliente no tiene prestamos.");
-            }
-            prestamoRespuesta.setNumeroCliente(numeroCliente);
-            prestamoRespuesta.setPrestamoResume(prestamoResumes(prestamosDelCliente));
-        }
-        return prestamoRespuesta;
-    }
-
-    //PUT - paga -> creo que funciona bien
-    public void pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException {
+    //PUT - paga cuotas -> OK
+    @Override
+    public PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException {
         List<Prestamo> prestamosDelCliente = prestamoDao.buscarPrestamoPorCliente(prestamoDto.getNumeroCliente());
         Prestamo pagar = null;
-
         for (Prestamo prestamo : prestamosDelCliente) {
-
             if (prestamo.getId() == id && prestamo.getLoanStatus() == LoanStatus.APROBADO) {
                 pagar = prestamo;
                 break;
             }
         }
-
         if (pagar == null) {
             throw new PrestamoNoExisteException("No se encontró ningún préstamo.");
         }
-
         List<PlanPago> planPagos = pagar.getPlanDePagos();
         if (planPagos == null || planPagos.isEmpty()) {
             throw new IllegalArgumentException("No hay cuotas para pagar.");
         }
-
-        //calcularSaldoRestante(pagar); //calcula el saldo restante
-        System.out.println("saldo restante: " + pagar.getSaldoRestante());
         pagar.setSaldoRestante(calcularSaldoRestante(pagar));
-        System.out.println("saldo restante: " + pagar.getSaldoRestante());
-
-        double montoCuota = pagar.getMonto() / pagar.getPlazoMeses();  // Asegúrate de que la cuota sea el monto dividido entre los meses
-        System.out.println("Monto de la cuota a pagar: " + montoCuota);
-
         Cliente cliente = clienteService.buscarClientePorDni(pagar.getDniTitular());
         if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(prestamoDto.getTipoMoneda()))) {
             throw new CuentaNoExisteException("El cliente no tiene cuentas en esa moneda.");
         }
-
         if (pagar.getSaldoRestante() <= 0) {
             throw new IllegalStateException("El préstamo ya está completamente pagado.");
         }
+        double montoCuota = pagar.getMonto() / pagar.getPlazoMeses();
+        double nuevoSaldo = pagar.getSaldoRestante() - montoCuota;
+        pagar.setSaldoRestante(nuevoSaldo);
+        int nuevosPagosRealizados = pagar.getPlazoMeses() - pagar.getPlanDePagos().size() + 1;
+        pagar.setPagosRealizados(nuevosPagosRealizados);
+        calcularSaldoRestante(pagar);
 
-        pagar.setSaldoRestante(pagar.getSaldoRestante() - montoCuota);
+        if (!pagar.getPlanDePagos().isEmpty()) {
+            pagar.getPlanDePagos().remove(0); // Eliminar la cuota pagada
+        }
 
-        System.out.println("saldo restante: " + pagar.getSaldoRestante());
-
-        pagar.incrementarPagosRealizados();
-        System.out.print(pagar.getPagosRealizados());
-        planPagos.remove(0);
-        pagar.setPlanDePagos(planPagos);
-
-        prestamoDao.update(pagar);
-        System.out.println("Pago realizado. Restante: " + pagar.getSaldoRestante());
-        prestamoDao.buscarPrestamoPorCliente(pagar.getDniTitular());
-        System.out.println(pagar);
-
-
+        List<PrestamoResume> resumenPrestamos = new ArrayList<>();
+        for (Prestamo prestamo : prestamosDelCliente) {
+            PrestamoResume resumen = new PrestamoResume();
+                    resumen.setMonto(prestamo.getMonto());
+                    resumen.setPlazoMeses(prestamo.getPlazoMeses());
+                    resumen.setPagosRealizados(prestamo.getPagosRealizados());
+                    resumen.setSaldoRestante(prestamo.getSaldoRestante());
+            resumenPrestamos.add(resumen);
+        }
+        prestamoDao.savePrestamo(pagar);
+        prestamosDelCliente.add(pagar);
+        return new PrestamoRespuesta(prestamoDto.getNumeroCliente(), resumenPrestamos);
     }
 
-    //no devuelve monto con interes bien
-    public List<PrestamoResume> prestamoResumes(List<Prestamo> prestamos) {
-        List<PrestamoResume> listado = new ArrayList<>();
-
-        for (Prestamo prestamo : prestamos) {
-            PrestamoResume datos = new PrestamoResume();
-            int pagosRealizados = prestamo.getPlazoMeses() - prestamo.getPlanDePagos().size();
-            datos.setMonto(prestamo.getMonto());
-            datos.setPlazoMeses(prestamo.getPlazoMeses());
-            datos.setPagosRealizados(pagosRealizados);
-
-            double saldoRestante = prestamo.getSaldoRestante();
-            System.out.print("Saldo restante de list resumes: " + saldoRestante);
-            datos.setSaldoRestante(saldoRestante);
-
-            listado.add(datos);
-            System.out.print("Impresion de resumes: " + listado);
+    //GET - obtiene todos los prestamos del cliente cuando se pasa su id
+    public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException {
+        if (clienteService.buscarClientePorDni(numeroCliente) == null) {
+            throw new ClientNoExisteException("El cliente con DNI: " + numeroCliente + " no existe.");
         }
-        return listado;
+        List<Prestamo> prestamosDelCliente = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
+        if (prestamosDelCliente == null || prestamosDelCliente.isEmpty()) {
+            throw new PrestamoNoExisteException("El cliente no tiene préstamos registrados.");
+        }
+        List<PrestamoResume> resumenPrestamos = new ArrayList<>();
+        for (Prestamo prestamo : prestamosDelCliente) {
+            PrestamoResume resumen = new PrestamoResume();
+            resumen.setMonto(prestamo.getMonto());
+            resumen.setPlazoMeses(prestamo.getPlazoMeses());
+            resumen.setPagosRealizados(prestamo.getPagosRealizados());
+            resumen.setSaldoRestante(prestamo.getSaldoRestante());
+            resumenPrestamos.add(resumen);
+            System.out.println("Impresion de prestamosPorCliente resumen: " + resumenPrestamos);
+        }
+        return new PrestamoRespuesta(numeroCliente, resumenPrestamos);
     }
 
     //PUT - actualizar datos -> no se
-    public Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto /*double monto, LoanStatus estado*/) throws PrestamoNoExisteException, CampoIncorrecto {
+    public Prestamo actualizarDatosPrestamo(long id, PrestamoDto prestamoDto) throws PrestamoNoExisteException, CampoIncorrecto {
         System.out.println("Iniciando la actualización del préstamo con ID: " + id);
 
         Prestamo prestamo = prestamoDao.findPrestamo(id);
@@ -195,48 +179,9 @@ public class PrestamoServiceImp implements PrestamoService {
         double montoConInteres = calcularInteres(prestamo);
         prestamo.setMonto(montoConInteres);
 
-
-        prestamoDao.update(prestamo);
+        prestamoDao.savePrestamo(prestamo);
         return prestamo;
     }
-
-    //put
-//    public PrestamoRespuesta realizarPago(long id) throws PrestamoNoExisteException {
-//        Prestamo prestamo = prestamoDao.findPrestamo(id);
-//        if (prestamo == null) {
-//            throw new PrestamoNoExisteException("El prestamo no existe");
-//        }
-//        double montoOriginal = prestamo.getMonto();
-//        double tasaInteresAnual = 0.40;
-//        int plazoMeses = prestamo.getPlazoMeses();
-//        double cuotaMensual = calcularCuotaMensual(montoOriginal, tasaInteresAnual, plazoMeses);
-//
-//        if (prestamo.getSaldoRestante() <= 0) {
-//            throw new IllegalStateException("El préstamo ya está saldado.");
-//        }
-//
-//        prestamo.incrementarPagosRealizados();
-//        int pagosRealizados = prestamo.getPagosRealizados();
-//        double montoConInteres = montoOriginal + (montoOriginal * tasaInteresAnual);
-//        double saldoRestante = calcularSaldoRestante(prestamo);
-//
-//        prestamo.setSaldoRestante(saldoRestante);
-//        prestamo.setMontoConInteres(montoConInteres);
-//        prestamo.setPagosRealizados(pagosRealizados);
-//        prestamoDao.update(prestamo);
-//
-//        PrestamoResume prestamoResume = new PrestamoResume(
-//                montoConInteres,
-//                plazoMeses,
-//                pagosRealizados,
-//                saldoRestante
-//        );
-//        List<PrestamoResume> prestamosResumes = new ArrayList<>();
-//        prestamosResumes.add(prestamoResume);
-//
-//        System.out.println("Después de pagar: " + prestamo);
-//        return new PrestamoRespuesta(prestamo.getDniTitular(), prestamosResumes);
-//    }
 
     //DELETE -
     public Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto {
@@ -250,7 +195,8 @@ public class PrestamoServiceImp implements PrestamoService {
     }
 
     //otros metodos
-    public double calcularInteres(Prestamo prestamo) throws CampoIncorrecto{
+    //ok
+    public double calcularInteres(Prestamo prestamo) throws CampoIncorrecto {
         int score = 600;
         //Prestamo prestamo = new Prestamo(prestamo, score);
         if (prestamo == null || prestamo.getMonto() <= 0 || prestamo.getPlazoMeses() <= 0) {
@@ -272,6 +218,7 @@ public class PrestamoServiceImp implements PrestamoService {
         return montoConInteres;
     }
 
+    //ok
     public void planPagos(Prestamo prestamo) {
         double montoConInteres = prestamo.getMonto();
         int meses = prestamo.getPlazoMeses();
@@ -284,24 +231,19 @@ public class PrestamoServiceImp implements PrestamoService {
         prestamo.setPlanDePagos(plan);
     }
 
-    private List<PlanPago> mostrarPlanPago(Prestamo prestamo) {
-        List<PlanPago> planPagos = prestamo.getPlanDePagos();
-        List<PlanPago> cuota = new ArrayList<>();
-        if (!planPagos.isEmpty()) {
-            cuota.add(planPagos.get(0));
-        }
-        return cuota;
-    }
 
+    //OK
     public double calcularSaldoRestante(Prestamo prestamo) {
-        double montoTotal = prestamo.getMonto();
-        double montoCuota = montoTotal / prestamo.getPlazoMeses();
-        int pagosRealizados = prestamo.getPagosRealizados();
-
-        double saldoRestante = montoTotal - montoCuota * pagosRealizados;
-        if (saldoRestante <= 0) {
-            saldoRestante = 0;
+        double montoCuota = prestamo.getMonto() / prestamo.getPlazoMeses(); // Calcula la cuota.
+        int pagosRealizados = prestamo.getPagosRealizados(); // Obtén los pagos realizados actuales.
+        double nuevoSaldo = prestamo.getMonto() - (montoCuota * pagosRealizados); // Calcula el saldo restante.
+        if (nuevoSaldo < 0) {
+            nuevoSaldo = 0; // Asegúrate de que el saldo no sea negativo.
         }
-        return saldoRestante;
+        prestamo.setSaldoRestante(nuevoSaldo);
+        prestamoDao.savePrestamo(prestamo); // Guardamos el préstamo actualizado en la base de datos.
+        System.out.print("Saldo restante de calcular saldo: " + nuevoSaldo);
+        return nuevoSaldo;
     }
+
 }

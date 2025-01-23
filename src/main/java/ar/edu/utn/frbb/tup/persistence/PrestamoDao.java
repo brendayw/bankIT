@@ -9,5 +9,4 @@ public interface PrestamoDao {
     Prestamo findPrestamo(long id);
     List<Prestamo> findAll();
     List<Prestamo> buscarPrestamoPorCliente(long dni);
-    Prestamo update(Prestamo prestamo);
 }

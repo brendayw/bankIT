@@ -4,7 +4,6 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,7 +12,6 @@ public class Prestamo {
     private long id;
     private long dniTitular;
     private double monto;
-    //private double montoConInteres; //monto total
     private TipoMoneda moneda;
     private int plazoMeses;
     private LoanStatus loanStatus; //lo marca como string
@@ -21,7 +19,6 @@ public class Prestamo {
     private List<PlanPago> planDePagos;
 
     //nuevos
-    private double montoTotalPagado;
     private double saldoRestante;
     private int pagosRealizados;
     private final double tasaInteres;
@@ -44,10 +41,9 @@ public class Prestamo {
         this.mensaje = devolverMensaje(this.loanStatus);
     }
 
-    public Prestamo(long id, double monto, /*double montoConInteres,*/ int plazoMeses, List<PlanPago> planDePagos) {
+    public Prestamo(long id, double monto, int plazoMeses, List<PlanPago> planDePagos) {
         this.id = id;
         this.monto = monto;
-        //this.montoConInteres = calcularMontoConInteres();
         this.tasaInteres = 0.40;
         this.plazoMeses = plazoMeses;
         this.planDePagos = planDePagos;
@@ -74,13 +70,6 @@ public class Prestamo {
     public void setMonto(double monto) {
         this.monto = monto;
     }
-
-//    public double getMontoConInteres() {
-//        return montoConInteres;
-//    }
-//    public void setMontoConInteres(double montoConInteres) {
-//        this.montoConInteres = montoConInteres;
-//    }
 
     public int getPlazoMeses() {
         return plazoMeses;
@@ -136,13 +125,6 @@ public class Prestamo {
         return tasaInteres;
     }
 
-    public double getMontoTotalPagado() {
-        return montoTotalPagado;
-    }
-    public void setMontoTotalPagado(double montoTotalPagado) {
-        this.montoTotalPagado = montoTotalPagado;
-    }
-
     //otros metodos
     private long generarIdAleatorio() {
         return Math.abs(new Random().nextLong() % 1_000_000_000L) + 2_000_000_000L;
@@ -178,21 +160,30 @@ public class Prestamo {
 //        return this.monto = monto + (monto * this.tasaInteres / 100); // Dividido entre 100 para que sea un porcentaje
 //    }
 
-    public void actualizarSaldoRestante() {
+    public double actualizarSaldoRestante() {
         double montoCuota = this.monto / this.plazoMeses;
-        this.saldoRestante = this.monto - montoCuota * this.pagosRealizados;
+        this.saldoRestante = this.monto - (montoCuota * this.pagosRealizados);
 
         // Si el saldo restante es menor a cero, lo establecemos en 0
         if (this.saldoRestante < 0) {
             this.saldoRestante = 0;
         }
+        return saldoRestante;
     }
 
     // Método para realizar un pago y actualizar el saldo restante
-    public void realizarPago() {
-        if (this.saldoRestante > 0) {
-            this.pagosRealizados++;
-            actualizarSaldoRestante(); // Recalcula el saldo restante
+    public void realizarPago(PlanPago pago) {
+        if (this.saldoRestante <= 0) {
+            throw new IllegalStateException("El préstamo ya está completamente pagado.");
+        }
+        if (!this.planDePagos.contains(pago)) {
+            throw new IllegalArgumentException("El plan de pago no corresponde.");
+        }
+        this.planDePagos.remove(pago);
+        this.pagosRealizados++;
+        this.saldoRestante -= pago.getMontoCuota();
+        if (this.saldoRestante < 0) {
+            this.saldoRestante = 0; // Asegura que nunca sea negativo
         }
     }
 
