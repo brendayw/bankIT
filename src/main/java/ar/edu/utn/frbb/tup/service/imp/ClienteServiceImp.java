@@ -71,7 +71,7 @@ public class ClienteServiceImp implements ClienteService {
     //otros metodos
     private void verificarClienteExistente(long dni) throws ClienteAlreadyExistsException {
         if (clienteDao.find(dni, false) != null) {
-            throw new ClienteAlreadyExistsException("Ya existe un cliente con DNI " + dni);
+            throw new ClienteAlreadyExistsException("Ya existe un cliente con ese DNI.");
         }
     }
 

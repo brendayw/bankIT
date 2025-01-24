@@ -21,23 +21,22 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     //BAD_REQUEST (400)
-    //datos de entrada inválidos o no soportados
     @ExceptionHandler({
             TipoMonedaNoSoportada.class,
             TipoPersonaNoSoportada.class,
             CampoIncorrecto.class,
-            CuentaNoSoportadaException.class})
+            CuentaNoSoportadaException.class,
+            ClienteMayorDeEdadException.class})
     protected ResponseEntity<Object> handleUnsupportedOrInvalidInputs(Exception ex, WebRequest request) {
-        CustomApiError error = new CustomApiError();// el json que devuelve el error
+        CustomApiError error = new CustomApiError();
         error.setErrorCode(400);
-        error.setErrorMessage(ex.getMessage());// settea el mensaje que le claves en el json
-        return handleExceptionInternal(ex, error,//aca hace sus chiches
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);// aca ponele el status code
+        error.setErrorMessage(ex.getMessage());
+        return handleExceptionInternal(ex, error,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     //BAD_REQUEST (400)
-    //errores relacionados a las reglas de negocio (cliente menor de edad, saldo insuficiente)
-    @ExceptionHandler({IllegalArgumentException.class, ClienteMayorDeEdadException.class, /*NoAlcanzaException.class*/})
+    @ExceptionHandler({IllegalArgumentException.class })
     protected ResponseEntity<Object> handleInvalidBusinessRules(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
         error.setErrorCode(400);
@@ -47,7 +46,6 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     }
 
     //CONFLICT (409)
-    //conflictos por recursos ya existentes
     @ExceptionHandler({TipoCuentaYaExisteException.class, CuentaYaExisteException.class, ClienteAlreadyExistsException.class})
     protected ResponseEntity<Object> handleResourceAlreadyExists(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
@@ -58,7 +56,6 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     }
 
     //NOT_FOUND (404)
-    //recursos no encontrados (inexistentes)
     @ExceptionHandler({PrestamoNoExisteException.class, ClientNoExisteException.class, CuentaNoExisteException.class, })
     protected ResponseEntity<Object> handleResourceNotFound(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
@@ -69,11 +66,10 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     }
 
     //NOT_FOUND (404)
-    //errores de estado ilegal
     @ExceptionHandler({IllegalStateException.class})
     protected ResponseEntity<Object> handleIllegalState(Exception ex, WebRequest request) {
         CustomApiError error = new CustomApiError();
-        error.setErrorCode(404); // Código específico para identificar este error
+        error.setErrorCode(404);
         error.setErrorMessage(ex.getMessage());
         return handleExceptionInternal(ex, error,
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);

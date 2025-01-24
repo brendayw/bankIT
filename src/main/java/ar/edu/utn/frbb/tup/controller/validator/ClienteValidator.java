@@ -2,32 +2,44 @@ package ar.edu.utn.frbb.tup.controller.validator;
 
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
+import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteMayorDeEdadException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.TipoPersonaNoSoportada;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
 
 @Component
 public class ClienteValidator {
 
-    public void validateCliente(ClienteDto clienteDto) throws TipoPersonaNoSoportada, CampoIncorrecto {
+    public void validateCliente(ClienteDto clienteDto) throws ClienteMayorDeEdadException, TipoPersonaNoSoportada, CampoIncorrecto {
         validatePersona(clienteDto);
         validateFechaNacimiento(clienteDto);
         validateDatosCompletos(clienteDto);
         validateDni(clienteDto);
     }
 
-    public void validatePersona(ClienteDto clienteDto) {
+    public void validatePersona(ClienteDto clienteDto) throws TipoPersonaNoSoportada{
         if (!"F".equals(clienteDto.getTipoPersona()) && !"J".equals(clienteDto.getTipoPersona())) {
             throw new TipoPersonaNoSoportada("El tipo de persona no es correcto. Ingrese F: fisica o J: juridica");
         }
     }
 
-    public void validateFechaNacimiento(ClienteDto clienteDto) {
+    public void validateFechaNacimiento(ClienteDto clienteDto) throws ClienteMayorDeEdadException, CampoIncorrecto {
+        if (clienteDto.getFechaNacimiento() == null || clienteDto.getFechaNacimiento().isEmpty()) {
+            throw new CampoIncorrecto("La fecha de nacimiento no puede ser nula o vacía.");
+        }
         try {
-            LocalDate.parse(clienteDto.getFechaNacimiento());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Error en el formato de fecha. Ingrese 'yyyy-mm-dd'");
+            LocalDate fechaNacimiento = LocalDate.parse(clienteDto.getFechaNacimiento());
+            LocalDate fechaActual = LocalDate.now();
+            int edad = Period.between(fechaNacimiento, fechaActual).getYears();
+
+            if (edad < 18) {
+                throw new ClienteMayorDeEdadException("El cliente debe ser mayor de 18 años.");
+            }
+        } catch (CampoIncorrecto e) {
+            throw new CampoIncorrecto("El formato de fecha de nacimiento es incorrecto. Use 'yyyy-mm-dd'.");
         }
     }
 

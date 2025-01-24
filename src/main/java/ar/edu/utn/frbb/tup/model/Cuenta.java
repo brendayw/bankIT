@@ -57,15 +57,17 @@ public class Cuenta {
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
     }
-    public void setTipoCuenta(TipoCuenta tipoCuenta) {
+    public Cuenta setTipoCuenta(TipoCuenta tipoCuenta) {
         this.tipoCuenta = tipoCuenta;
+        return this;
     }
 
     public TipoMoneda getTipoMoneda() {
         return tipoMoneda;
     }
-    public void setTipoMoneda(TipoMoneda tipoMoneda) {
+    public Cuenta setTipoMoneda(TipoMoneda tipoMoneda) {
         this.tipoMoneda = tipoMoneda;
+        return this;
     }
 
     public LocalDate getFechaCreacion() {
@@ -78,8 +80,9 @@ public class Cuenta {
     public double getBalance() {
         return balance;
     }
-    public void setBalance(double balance) {
+    public Cuenta setBalance(double balance) {
         this.balance = balance;
+        return this;
     }
 
     public boolean isEstado() {

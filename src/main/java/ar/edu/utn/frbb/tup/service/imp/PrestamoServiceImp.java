@@ -73,7 +73,7 @@ public class PrestamoServiceImp implements PrestamoService {
 
     //PUT - paga cuota del prestamo -> OK (refactorizado)
     @Override
-    public PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException, CuentaNoExisteException {
+    public PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException, CuentaNoExisteException, ClientNoExisteException {
         Prestamo prestamo = obtenerPrestamoAprobado(prestamoDto.getNumeroCliente(), id);
         validarCuentaCliente(prestamoDto.getNumeroCliente(), prestamoDto.getTipoMoneda());
         pagarCuotaPrestamo(prestamo);
@@ -118,7 +118,7 @@ public class PrestamoServiceImp implements PrestamoService {
         }
     }
 
-    private void validarCuentaCliente(long dni, String tipoMoneda) throws CuentaNoExisteException {
+    private void validarCuentaCliente(long dni, String tipoMoneda) throws CuentaNoExisteException, ClientNoExisteException {
         Cliente cliente = clienteService.buscarClientePorDni(dni);
         validarCuentaCliente(cliente, tipoMoneda);
     }

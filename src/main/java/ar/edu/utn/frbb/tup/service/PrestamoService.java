@@ -15,7 +15,7 @@ public interface PrestamoService {
     PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto;
     List<Prestamo> buscarPrestamos();
     Prestamo buscarPrestamoPorId(long id) throws PrestamoNoExisteException;
-    PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException;
+    PrestamoRespuesta pagarCuota(PrestamoDto prestamoDto, long id) throws PrestamoNoExisteException, ClientNoExisteException;
     PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException;
     Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto;
 }
