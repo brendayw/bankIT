@@ -51,24 +51,20 @@ public class ClienteServiceTest {
         cliente.setApellido(apellido);
         cliente.setDni(dni);
         cliente.setFechaNacimiento(fechaNacimiento);
-        cliente.setTelefono("2914789635");
-        cliente.setEmail("brendayañez@gmail.com");
-        cliente.setTipoPersona("F");
-        cliente.setBanco("Nacion");
         return cliente;
     }
 
     //metodo para crear clientes con model
-    private Cliente crearCliente(String nombre, String apellido, Long dni, String fechaNacimiento, String telefono, String email, String tipoPersona, String banco) {
+    private Cliente crearCliente(String nombre, String apellido, Long dni, LocalDate fechaNacimiento, String telefono, String email, TipoPersona tipoPersona, String banco) {
         Cliente cliente = new Cliente();
-        cliente.setNombre("Brenda");
-        cliente.setApellido("Yañez");
-        cliente.setDni(40860006);
-        cliente.setFechaNacimiento(LocalDate.of(1997,03,18));
-        cliente.setTelefono("2914789635");
-        cliente.setEmail("brendayañez@gmail.com");
-        cliente.setTipoPersona(TipoPersona.PERSONA_FISICA);
-        cliente.setBanco("Nacion");
+        cliente.setNombre(nombre);
+        cliente.setApellido(apellido);
+        cliente.setDni(dni);
+        cliente.setFechaNacimiento(fechaNacimiento);
+        cliente.setTelefono(telefono);
+        cliente.setEmail(email);
+        cliente.setTipoPersona(tipoPersona);
+        cliente.setBanco(banco);
         cliente.setCuentas(new HashSet<>());
         return cliente;
     }
@@ -76,10 +72,10 @@ public class ClienteServiceTest {
     //crea cliente
     private Cuenta crearCuenta(long dni, TipoMoneda tipoMoneda, TipoCuenta tipoCuenta, double balance) {
         Cuenta cuenta = new Cuenta();
-        cuenta.setDniTitular(40860006);
-        cuenta.setTipoMoneda(TipoMoneda.PESOS);
-        cuenta.setTipoCuenta(TipoCuenta.CAJA_AHORRO);
-        cuenta.setBalance(100000.0);
+        cuenta.setDniTitular(dni);
+        cuenta.setTipoMoneda(tipoMoneda);
+        cuenta.setTipoCuenta(tipoCuenta);
+        cuenta.setBalance(balance);
         return cuenta;
     }
 
@@ -135,8 +131,8 @@ public class ClienteServiceTest {
     public void testAgregarCuentaACliente_Success() throws ClientNoExisteException, TipoCuentaYaExisteException {
         ClienteService clienteService = Mockito.mock(ClienteService.class);
 
-        Cliente cliente = crearCliente("Brenda", "Yañez", 40860006L, "1997-03-18",
-                "2914789635", "brendayañez@gmail.com", "F", "Nacion");
+        Cliente cliente = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"),
+                "2914789635", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
 
         Cuenta cuenta = crearCuenta(40860006, TipoMoneda.PESOS, TipoCuenta.CAJA_AHORRO, 100000.0);
         cliente.addCuenta(cuenta);
@@ -178,8 +174,8 @@ public class ClienteServiceTest {
     public void testBuscaClientePorDni_Success() throws ClientNoExisteException {
         ClienteService clienteServiceMock = Mockito.mock(ClienteService.class);
         Long dni = 40860006L;
-        Cliente clienteEsperado = crearCliente("Brenda", "Yañez", 40860006L, "1997-03-18",
-                "2914789635", "brendayañez@gmail.com", "F", "Nacion");
+        Cliente clienteEsperado = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"),
+                "2914789635", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
 
         ClienteDto clienteEsperadoDto = new ClienteDto(clienteEsperado);
 
@@ -193,10 +189,6 @@ public class ClienteServiceTest {
         assertEquals(clienteEsperadoDto.getApellido(), clienteObtenido.getApellido(), "El apellido del cliente debe coincidir");
 
         System.out.println("Cliente encontrado con éxito:");
-//        System.out.println("Nombre: " + clienteObtenido.getNombre());
-//        System.out.println("Apellido: " + clienteObtenido.getApellido());
-//        System.out.println("DNI: " + clienteObtenido.getDni());
-//        System.out.println("Fecha de nacimiento: " + clienteObtenido.getFechaNacimiento());
 
         verify(clienteServiceMock, times(1)).buscarClientePorDni(dni);
     }

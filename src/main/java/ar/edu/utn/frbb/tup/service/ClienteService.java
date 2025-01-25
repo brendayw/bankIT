@@ -17,7 +17,6 @@ public interface ClienteService {
     void agregarPrestamo(Prestamo prestamo, Long dniTitular) throws ClientNoExisteException;
     Cliente buscarClientePorDni(Long dni) throws ClientNoExisteException;
     List<Cliente> buscarClientes();
-    Cliente actualizarDatosDelCliente(Long dni, String nuevoTelefono, String nuevoEmail, Boolean activo) throws ClientNoExisteException;
     Cliente desactivarCliente(Long dni) throws ClientNoExisteException;
 
 

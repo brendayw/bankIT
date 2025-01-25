@@ -8,7 +8,6 @@ import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteMayorDeEdadException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.TipoPersonaNoSoportada;
-import org.springframework.http.ResponseEntity;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,7 @@ public class ClienteController {
 
     @Autowired
     private ClienteValidator clienteValidator;
+
 
     //crea cliente
     @PostMapping
@@ -39,16 +39,8 @@ public class ClienteController {
 
     //busca cliente
     @GetMapping("/{dni}")
-    public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable long dni) throws ClientNoExisteException {
-       Cliente cliente = clienteService.buscarClientePorDni(dni);
-        return ResponseEntity.ok(cliente);
-    }
-
-    //actualiza cliente
-    @PutMapping("/{dni}")
-    public Cliente actualizarCliente(@PathVariable long dni, @RequestBody Cliente clienteActualizado) throws ClientNoExisteException {
-        Cliente update = clienteService.actualizarDatosDelCliente(dni, clienteActualizado.getTelefono(), clienteActualizado.getEmail(), clienteActualizado.isActivo());
-        return update;
+    public Cliente obtenerClientePorId(@PathVariable long dni) throws ClientNoExisteException {
+        return clienteService.buscarClientePorDni(dni);
     }
 
     //desactiva cliente

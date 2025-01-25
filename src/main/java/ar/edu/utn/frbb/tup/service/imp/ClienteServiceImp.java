@@ -51,20 +51,11 @@ public class ClienteServiceImp implements ClienteService {
         return clienteDao.findAll();
     }
 
-    //update -> actualiza datos del cliente
-    public Cliente actualizarDatosDelCliente(Long dni, String nuevoTelefono, String nuevoEmail, Boolean activo) throws ClientNoExisteException {
-        Cliente cliente = buscarClientePorDni(dni);
-        //actualiza
-        actualizarDatos(cliente, nuevoTelefono, nuevoEmail, activo);
-        clienteDao.update(cliente);
-        return cliente;
-    }
-
     //delete
     public Cliente desactivarCliente(Long dni) throws ClientNoExisteException {
         Cliente cliente = clienteDao.find(dni, true);
         cliente.setActivo(false);
-        actualizarDatosDelCliente(dni,null, null, false);
+        clienteDao.save(cliente);
         return cliente;
     }
 
