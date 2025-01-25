@@ -3,7 +3,6 @@ package ar.edu.utn.frbb.tup.controller;
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
-import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,7 +107,6 @@ public class ClienteControllerTest {
         System.out.println("Excepcion encontrada: " + e.getMessage());
     }
 
-
     //busca todos los clientes
     @Test
     void testBuscarClientes_Succes() {
@@ -129,7 +125,6 @@ public class ClienteControllerTest {
         assertTrue(resultado.contains(cliente2));
         verify(clienteService, times(1)).buscarClientes();
     }
-
 
     //desactiva al cliente
     @Test

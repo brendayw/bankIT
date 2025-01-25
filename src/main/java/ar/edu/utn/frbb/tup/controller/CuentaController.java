@@ -50,8 +50,7 @@ public class CuentaController {
     //actualiza cuenta
     @PutMapping("/{id}")
     public Cuenta actualizarCuenta(@PathVariable long id, @RequestBody Cuenta cuentaActualizado) throws CuentaNoExisteException {
-        Cuenta update = cuentaService.actulizarDatosCuenta(id, cuentaActualizado.getBalance(), cuentaActualizado.isEstado());
-        return update;
+        return  cuentaService.actulizarDatosCuenta(id, cuentaActualizado.getBalance(), cuentaActualizado.isEstado());
     }
 
     //desactiva cuenta
