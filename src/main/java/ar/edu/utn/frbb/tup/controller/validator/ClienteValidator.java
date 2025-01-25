@@ -38,7 +38,7 @@ public class ClienteValidator {
             if (edad < 18) {
                 throw new ClienteMayorDeEdadException("El cliente debe ser mayor de 18 años.");
             }
-        } catch (CampoIncorrecto e) {
+        } catch (DateTimeParseException e) {
             throw new CampoIncorrecto("El formato de fecha de nacimiento es incorrecto. Use 'yyyy-mm-dd'.");
         }
     }

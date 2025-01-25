@@ -3,6 +3,7 @@ package ar.edu.utn.frbb.tup.controller;
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
+import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteMayorDeEdadException;
@@ -25,7 +26,7 @@ public class ClienteController {
 
     //crea cliente
     @PostMapping
-    public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException, ClienteMayorDeEdadException, TipoPersonaNoSoportada {
+    public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException, CampoIncorrecto, ClienteMayorDeEdadException, TipoPersonaNoSoportada {
         clienteValidator.validateCliente(clienteDto);
         return clienteService.darDeAltaCliente(clienteDto);
     }

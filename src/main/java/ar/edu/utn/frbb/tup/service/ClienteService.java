@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface ClienteService {
     Cliente darDeAltaCliente(ClienteDto clienteDto) throws ClienteAlreadyExistsException, ClienteMayorDeEdadException;
-    void agregarCuenta(Cuenta cuenta, Long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException;
+    void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException;
     void agregarPrestamo(Prestamo prestamo, Long dniTitular) throws ClientNoExisteException;
     Cliente buscarClientePorDni(Long dni) throws ClientNoExisteException;
     List<Cliente> buscarClientes();

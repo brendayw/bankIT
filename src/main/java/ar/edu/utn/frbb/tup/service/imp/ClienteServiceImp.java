@@ -88,7 +88,7 @@ public class ClienteServiceImp implements ClienteService {
     }
 
     //agrega una cuenta
-    public void agregarCuenta(Cuenta cuenta, Long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException {
+    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException {
         Cliente titular = clienteDao.find(dniTitular, true);
         verificarTipoCuentaExistente(titular, cuenta);
         titular.getCuentas().add(cuenta);

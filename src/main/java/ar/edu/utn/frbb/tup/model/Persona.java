@@ -6,7 +6,7 @@ import java.time.Period;
 public class Persona {
     private String nombre;
     private String apellido;
-    private long dni;
+    private Long dni;
     private LocalDate fechaNacimiento;
     private String telefono;
     private String email;

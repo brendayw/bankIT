@@ -1,12 +1,12 @@
 package ar.edu.utn.frbb.tup.controller.dto;
 
 public class PersonaDto {
-    private String nombre;
-    private String apellido;
-    private long dni;
-    private String fechaNacimiento;
-    private String telefono;
-    private String email;
+    String nombre;
+    String apellido;
+    long dni;
+    String fechaNacimiento;
+    String telefono;
+    String email;
 
     public String getNombre() {
         return nombre;

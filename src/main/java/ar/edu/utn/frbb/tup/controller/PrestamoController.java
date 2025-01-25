@@ -58,7 +58,7 @@ public class PrestamoController {
 
     //paga cuotas del prestamo
     @PutMapping("/pagar/{id}")
-    public PrestamoRespuesta pagarCuota(@PathVariable long id, @RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException {
+    public PrestamoRespuesta pagarCuota(@PathVariable long id, @RequestBody PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, PrestamoNoExisteException {
         PrestamoRespuesta prestamoActualizado = prestamoService.pagarCuota(prestamoDto, id);
         if (prestamoActualizado == null) {
             throw new RuntimeException("Error al procesar el pago del préstamo.");

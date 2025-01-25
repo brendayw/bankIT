@@ -82,7 +82,7 @@ public class PrestamoServiceImp implements PrestamoService {
 
     //GET - obtiene el prestamo por dni o numero de cliente -> OK (refactorizado)
     @Override
-    public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException {
+    public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException, PrestamoNoExisteException {
         Cliente cliente = obtenerClientePorDni(numeroCliente);
         List<Prestamo> prestamos = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
 
@@ -138,7 +138,7 @@ public class PrestamoServiceImp implements PrestamoService {
                 .orElseThrow(() -> new PrestamoNoExisteException("No se encontró un préstamo aprobado con el ID: " + id));
     }
 
-    private Prestamo crearPrestamo(PrestamoDto prestamoDto, int score) {
+    private Prestamo crearPrestamo(PrestamoDto prestamoDto, int score) throws CampoIncorrecto {
         Prestamo prestamo = new Prestamo(prestamoDto, score);
         double montoSolicitado = prestamoDto.getMontoPrestamo();
         double montoConInteres = calcularInteres(prestamo);

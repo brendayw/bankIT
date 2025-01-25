@@ -3,6 +3,7 @@ package ar.edu.utn.frbb.tup.controller;
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.*;
 import ar.edu.utn.frbb.tup.service.CuentaService;
@@ -23,7 +24,7 @@ public class CuentaController {
 
     //crea cuenta
     @PostMapping
-    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
+    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto) throws CuentaYaExisteException, CampoIncorrecto, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
         cuentaValidator.validateCuenta(cuentaDto);
         return cuentaService.darDeAltaCuenta(cuentaDto);
     }
