@@ -3,12 +3,13 @@ package ar.edu.utn.frbb.tup.controller.validator;
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoMonedaNoSoportada;
+import ar.edu.utn.frbb.tup.model.exception.prestamo.CreditScoreException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PrestamoValidator {
 
-    public void validatePrestamo(PrestamoDto prestamoDto) throws TipoMonedaNoSoportada, CampoIncorrecto {
+    public void validatePrestamo(PrestamoDto prestamoDto) throws CreditScoreException, TipoMonedaNoSoportada, CampoIncorrecto {
         validateTipoMoneda(prestamoDto);
         validateDatosCompletos(prestamoDto);
         validateDni(prestamoDto);

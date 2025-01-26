@@ -9,6 +9,10 @@ public class PrestamoDetalle {
     private String mensaje;
     private List<PlanPago> planPagos;
 
+    public PrestamoDetalle() {
+
+    }
+
     public PrestamoDetalle(LoanStatus estado, String mensaje, List<PlanPago> planPagos) {
         this.estado = estado;
         this.mensaje = mensaje;

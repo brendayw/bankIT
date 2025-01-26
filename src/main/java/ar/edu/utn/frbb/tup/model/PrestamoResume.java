@@ -10,6 +10,7 @@ public class PrestamoResume {
     public PrestamoResume() {
 
     }
+
     public PrestamoResume(double monto, int plazoMeses, int pagosRealizados, double saldoRestante) {
         this.monto = monto;
         this.plazoMeses = plazoMeses;
