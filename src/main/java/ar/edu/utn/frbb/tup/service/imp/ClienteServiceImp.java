@@ -20,8 +20,8 @@ import java.util.List;
 
 @Service
 public class ClienteServiceImp implements ClienteService {
-    ClienteDao clienteDao;
-    CuentaDao cuentaDao;
+    @Autowired ClienteDao clienteDao;
+    @Autowired CuentaDao cuentaDao;
 
     public ClienteServiceImp(ClienteDao clienteDao, CuentaDao cuentaDao) {
         this.clienteDao = clienteDao;

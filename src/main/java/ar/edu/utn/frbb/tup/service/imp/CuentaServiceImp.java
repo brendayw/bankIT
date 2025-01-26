@@ -22,10 +22,8 @@ import java.util.Set;
 
 @Service
 public class CuentaServiceImp implements CuentaService {
-    CuentaDao cuentaDao;
-
-    @Autowired
-    ClienteService clienteService;
+    @Autowired  CuentaDao cuentaDao;
+    @Autowired ClienteService clienteService;
 
     public CuentaServiceImp(CuentaDao cuentaDao, ClienteService clienteService) {
         this.cuentaDao = cuentaDao;
