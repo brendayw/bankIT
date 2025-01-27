@@ -11,7 +11,6 @@ import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import ar.edu.utn.frbb.tup.service.ClienteService;
-import ar.edu.utn.frbb.tup.service.PrestamoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ public class ClienteServiceImp implements ClienteService {
     }
 
     //delete
-    public Cliente desactivarCliente(Long dni) throws ClientNoExisteException {
+    public Cliente desactivarCliente(Long dni) {
         Cliente cliente = clienteDao.find(dni, true);
         cliente.setActivo(false);
         clienteDao.save(cliente);
@@ -79,7 +78,7 @@ public class ClienteServiceImp implements ClienteService {
     }
 
     //agrega una cuenta
-    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException {
+    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException {
         Cliente titular = clienteDao.find(dniTitular, true);
         verificarTipoCuentaExistente(titular, cuenta);
         titular.getCuentas().add(cuenta);

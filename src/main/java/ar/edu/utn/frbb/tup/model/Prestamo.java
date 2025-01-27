@@ -17,7 +17,7 @@ public class Prestamo {
     private int plazoMeses;
     private LoanStatus loanStatus;
     private String mensaje;
-    private List<PlanPago> planDePagos;
+    List<PlanPago> planDePagos;
 
     //nuevos
     private double saldoRestante;
@@ -28,6 +28,13 @@ public class Prestamo {
     public Prestamo() {
         this.id = generarIdAleatorio();
         this.planDePagos = new ArrayList<>();
+        this.tasaInteres = 0.40;
+    }
+
+    public Prestamo(long dniTitular, double montoSolicitado, LoanStatus loanStatus) {
+        this.dniTitular = dniTitular;
+        this.montoSolicitado = montoSolicitado;
+        this.loanStatus = loanStatus;
         this.tasaInteres = 0.40;
     }
 

@@ -4,7 +4,6 @@ import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.*;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.exception.CampoIncorrecto;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.prestamo.CreditScoreException;
@@ -40,7 +39,7 @@ public class PrestamoServiceImp implements PrestamoService {
 
     //POST - solicitar prestamo -> OK (refactorizado)
     @Override
-    public PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException, PrestamoNoExisteException, CampoIncorrecto {
+    public PrestamoDetalle darAltaPrestamo(PrestamoDto prestamoDto) throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException {
         Cliente cliente = obtenerClientePorDni(prestamoDto.getNumeroCliente());
         validarCuentaCliente(cliente, prestamoDto.getTipoMoneda());
         creditScoreService.validarScore(cliente);
@@ -95,13 +94,12 @@ public class PrestamoServiceImp implements PrestamoService {
 
     //DELETE - cierra el prestamo (refactorizado)
     @Override
-    public Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException, CampoIncorrecto {
+    public Prestamo cerrarPrestamo(long id) throws PrestamoNoExisteException {
         Prestamo prestamo = obtenerPrestamoPorId(id);
         prestamo.setLoanStatus(LoanStatus.CERRADO);
         prestamoDao.savePrestamo(prestamo);
         return prestamo;
     }
-
 
     //otros metodos
     private Cliente obtenerClientePorDni(long dni) throws ClientNoExisteException {
@@ -112,7 +110,7 @@ public class PrestamoServiceImp implements PrestamoService {
         return cliente;
     }
 
-    private void validarCuentaCliente(Cliente cliente, String tipoMoneda) throws CuentaNoExisteException {
+    public void validarCuentaCliente(Cliente cliente, String tipoMoneda) throws CuentaNoExisteException {
         if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(tipoMoneda))) {
             throw new CuentaNoExisteException("El cliente no tiene cuenta en la moneda especificada.");
         }
@@ -138,7 +136,7 @@ public class PrestamoServiceImp implements PrestamoService {
                 .orElseThrow(() -> new PrestamoNoExisteException("No se encontró un préstamo aprobado con el ID: " + id));
     }
 
-    private Prestamo crearPrestamo(PrestamoDto prestamoDto, int score) throws CampoIncorrecto {
+    private Prestamo crearPrestamo(PrestamoDto prestamoDto, int score) {
         Prestamo prestamo = new Prestamo(prestamoDto, score);
         double montoSolicitado = prestamoDto.getMontoPrestamo();
         double montoConInteres = calcularInteres(prestamo);
@@ -149,7 +147,7 @@ public class PrestamoServiceImp implements PrestamoService {
     }
 
     //ok - refactorizado
-    private double calcularInteres(Prestamo prestamo) throws CampoIncorrecto {
+    private double calcularInteres(Prestamo prestamo) {
         double monto = prestamo.getMonto();
         double tiempo = prestamo.getPlazoMeses() / 12.0;
         double interes = monto * prestamo.getTasaInteres() * tiempo;
@@ -180,7 +178,7 @@ public class PrestamoServiceImp implements PrestamoService {
     }
 
     //ok
-    private PrestamoRespuesta generarRespuestaPrestamos(long numeroCliente) {
+    public PrestamoRespuesta generarRespuestaPrestamos(long numeroCliente) {
         List<Prestamo> prestamos = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
         List<PrestamoResume> resumenPrestamos = new ArrayList<>();
         for (Prestamo prestamo : prestamos) {

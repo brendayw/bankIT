@@ -7,7 +7,7 @@ import java.util.List;
 public class PrestamoDetalle {
     private LoanStatus estado;
     private String mensaje;
-    private List<PlanPago> planPagos;
+    List<PlanPago> planPagos;
 
     public PrestamoDetalle() {
 

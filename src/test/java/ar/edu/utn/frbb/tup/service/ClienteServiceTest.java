@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
-import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.*;
 public class ClienteServiceTest {
 
     @Mock private ClienteDao clienteDao;
-    @InjectMocks private ClienteValidator clienteValidator;
     @InjectMocks private ClienteServiceImp clienteService;
 
     @BeforeAll
