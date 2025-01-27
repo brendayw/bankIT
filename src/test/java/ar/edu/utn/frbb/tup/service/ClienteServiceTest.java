@@ -1,25 +1,25 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
+import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Prestamo;
 import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
-import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteMayorDeEdadException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.TipoCuentaYaExisteException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
-
 import ar.edu.utn.frbb.tup.service.imp.ClienteServiceImp;
-import org.junit.jupiter.api.BeforeAll;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,32 +37,30 @@ public class ClienteServiceTest {
     @Mock private ClienteDao clienteDao;
     @InjectMocks private ClienteServiceImp clienteService;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     //metodo para crear clientes con Dto
-    private ClienteDto crearClienteDto(String nombre, String apellido, Long dni, String fechaNacimiento) {
+    private ClienteDto crearClienteDto(String nombre, String apellido, Long dni, String fechaNacimiento, String tipoPersona, String banco) {
         ClienteDto cliente = new ClienteDto();
         cliente.setNombre(nombre);
         cliente.setApellido(apellido);
         cliente.setDni(dni);
         cliente.setFechaNacimiento(fechaNacimiento);
+        cliente.setTipoPersona(tipoPersona);
+        cliente.setBanco(banco);
         return cliente;
     }
 
     //metodo para crear clientes con model
-    private Cliente crearCliente(String nombre, String apellido, Long dni, LocalDate fechaNacimiento, String telefono, String email, TipoPersona tipoPersona, String banco) {
+    private Cliente crearCliente(String nombre, String apellido, Long dni, LocalDate fechaNacimiento) {
         Cliente cliente = new Cliente();
         cliente.setNombre(nombre);
         cliente.setApellido(apellido);
         cliente.setDni(dni);
         cliente.setFechaNacimiento(fechaNacimiento);
-        cliente.setTelefono(telefono);
-        cliente.setEmail(email);
-        cliente.setTipoPersona(tipoPersona);
-        cliente.setBanco(banco);
         cliente.setCuentas(new HashSet<>());
         return cliente;
     }
@@ -77,136 +75,118 @@ public class ClienteServiceTest {
         return cuenta;
     }
 
-    //cliente nuevo
-    @Test
-    public void testCrearClienteNuevo_Success() throws ClienteMayorDeEdadException {
-       ClienteDto clienteNuevo = crearClienteDto("Brenda", "Yañez", 40860006L, "1997-03-18");
+    //crea prestamo
+    private PrestamoDto crearPrestamoDto(long numeroCliente, double montoPrestamo, String tipoMoneda, int plazo) {
+        PrestamoDto prestamoDto = new PrestamoDto();
+        prestamoDto.setNumeroCliente(numeroCliente);
+        prestamoDto.setMontoPrestamo(montoPrestamo);
+        prestamoDto.setTipoMoneda(tipoMoneda);
+        prestamoDto.setPlazoMeses(plazo);
+        return prestamoDto;
+    }
 
-        try {
-            clienteService.darDeAltaCliente(clienteNuevo);
-            System.out.println("Cliente creado con éxito.");
-        } catch (ClienteAlreadyExistsException e) {
-            assertEquals("Ya existe un cliente con ese DNI.", e.getMessage());
-            System.out.println("Excepción capturada: " + e.getMessage());
-        }
+    //crear cliente nuevo
+    @Test
+    void testCrearCliente_Success() throws ClienteAlreadyExistsException, ClienteMayorDeEdadException {
+        ClienteDto clienteDto = crearClienteDto( "Brenda", "Yañez",
+                40860006L, "1997-04-09", "F", "Nacion");
+        Cliente cliente = new Cliente(clienteDto);
+
+        when(clienteDao.find(cliente.getDni(), false)).thenReturn(null);
+        doNothing().when(clienteDao).save(any(Cliente.class));
+
+        Cliente result = clienteService.darDeAltaCliente(clienteDto);
+
+        assertNotNull(result);
+        assertEquals(40860006L, result.getDni());
+        verify(clienteDao, times(1)).save(any(Cliente.class));
     }
 
     //cliente menor a 18 años
     @Test
     public void testClienteMenorDeEdad() throws ClienteAlreadyExistsException{
-        ClienteDto clienteMenorDeEdad = crearClienteDto("Juan", "Perez", 12345678L, "2009-03-18");
+        ClienteDto menorDeEdad = crearClienteDto("Juan", "Perez", 12345678L,
+                "2009-03-18", "F", "Provincia");
+        Cliente cliente = new Cliente(menorDeEdad);
 
-        try {
-            clienteService.darDeAltaCliente(clienteMenorDeEdad);
-            fail("Se esperaba que se lanzara una excepción ClienteMayorDeEdadException");
-        } catch (ClienteMayorDeEdadException e) {
-            assertEquals("El cliente debe ser mayor a 18 años", e.getMessage());
-            System.out.println("Excepción capturada: " + e.getMessage());
-        }
+        when(clienteDao.find(cliente.getDni(), false)).thenReturn(null);
+
+        ClienteMayorDeEdadException e = assertThrows(ClienteMayorDeEdadException.class, () -> clienteService.darDeAltaCliente(menorDeEdad));
+        assertEquals("El cliente debe ser mayor a 18 años", e.getMessage());
+        verify(clienteDao, never()).save(any(Cliente.class));
     }
 
     //cliente ya existe
     @Test
     public void testClienteExistente() throws ClienteMayorDeEdadException, ClienteAlreadyExistsException {
-                ClienteDto cliente = crearClienteDto("Brenda", "Yañez", 40860006L, "1997-04-09");
-        ClienteService clienteServiceMock = Mockito.mock(ClienteService.class);
+        ClienteDto cliente = crearClienteDto("Brenda", "Yañez", 40860006L,
+                "1997-04-09", "F", "Nacion");
+        Cliente clienteExistente = new Cliente(cliente);
 
-        Mockito.doThrow(new ClienteAlreadyExistsException("Ya existe un cliente con ese DNI."))
-                .when(clienteServiceMock)
-                .darDeAltaCliente(cliente);
+        when(clienteDao.find(cliente.getDni(), false)).thenReturn(clienteExistente);
 
-        try {
-            clienteServiceMock.darDeAltaCliente(cliente);
-            fail("Se esperaba que se lanzara una excepción ClienteAlreadyExistsException");
-        } catch (ClienteAlreadyExistsException e) {
-            assertEquals("Ya existe un cliente con ese DNI.", e.getMessage());
-            System.out.println("Excepción capturada: " + e.getMessage());
-        }
+        ClienteAlreadyExistsException e = assertThrows(ClienteAlreadyExistsException.class, () -> clienteService.darDeAltaCliente(cliente));
+        assertEquals("Ya existe un cliente con ese DNI.", e.getMessage());
+        verify(clienteDao, never()).save(any(Cliente.class));
     }
 
     //agrega cuenta correctamente
     @Test
     public void testAgregarCuentaACliente_Success() throws ClientNoExisteException, TipoCuentaYaExisteException {
-        ClienteService clienteService = Mockito.mock(ClienteService.class);
-
-        Cliente cliente = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"),
-                "2914789635", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
-
+        Cliente cliente = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"));
         Cuenta cuenta = crearCuenta(40860006, TipoMoneda.PESOS, TipoCuenta.CAJA_AHORRO, 100000.0);
-        cliente.addCuenta(cuenta);
 
-        doNothing().when(clienteService).agregarCuenta(cuenta, cliente.getDni());
-        clienteService.agregarCuenta(cuenta, cliente.getDni());
+        when(clienteDao.find(40860006L, true)).thenReturn(cliente);
+        doNothing().when(clienteDao).save(cliente);
 
-        assertNotNull(cliente.getCuentas(), "La lista de cuentas no debe ser nula");
-        assertTrue(cliente.getCuentas().contains(cuenta), "La cuenta debe estar en la lista de cuentas");
+        clienteService.agregarCuenta(cuenta, 40860006L);
 
-        verify(clienteService, times(1)).agregarCuenta(cuenta, cliente.getDni());
-        System.out.println("Cuenta agregada con éxito.");
+        assertNotNull(cliente.getCuentas());
+        assertTrue(cliente.getCuentas().contains(cuenta));
+
+        verify(clienteDao, times(1)).find(40860006L, true);
+        verify(clienteDao, times(1)).save(cliente);
     }
 
-    //intenta agregar cuenta un tipo existente y de la moneda existente
+    //agrega prestamo corectamente
     @Test
-    public void testCrearCuentaTipoYMonedaExistente() throws TipoCuentaYaExisteException, ClientNoExisteException {
-        ClienteService clienteServiceMock = Mockito.mock(ClienteService.class);
-        ClienteDto cliente = crearClienteDto("Brenda", "Yañez", 40860006L, "1997-04-09");
-        Cuenta cuenta1 = crearCuenta(40860006L,TipoMoneda.PESOS, TipoCuenta.CAJA_AHORRO, 1000.0);
+    void testAgregarPrestamoACliente_Sucess() throws ClientNoExisteException {
+        Cliente cliente = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"));
+        PrestamoDto dto = crearPrestamoDto(40860006, 210000.0, "P", 12);
+        Prestamo prestamo = new Prestamo(dto, 750);
+        when(clienteDao.find(40860006, true)).thenReturn(cliente);
+        doNothing().when(clienteDao).save(cliente);
 
-        doThrow(new TipoCuentaYaExisteException("Ya existe una cuenta con ese tipo y moneda para este cliente."))
-                .when(clienteServiceMock)
-                .agregarCuenta(cuenta1, cliente.getDni());
+        clienteService.agregarPrestamo(prestamo, cliente.getDni());
 
-        try {
-            clienteServiceMock.agregarCuenta(cuenta1, cliente.getDni());
-            fail("Se esperaba que se lanzara una excepción TipoCuentaYaExisteException");
-        } catch (TipoCuentaYaExisteException e) {
-            assertEquals("Ya existe una cuenta con ese tipo y moneda para este cliente.", e.getMessage());
-            System.out.println("Excepción capturada: " + e.getMessage());
-        }
+        assertNotNull(cliente.getPrestamos());
+        assertTrue(cliente.getPrestamos().contains(prestamo));
 
-        verify(clienteServiceMock, times(1)).agregarCuenta(cuenta1, cliente.getDni()); // Verifica que el método fue llamado dos veces
+        verify(clienteDao, times(1)).find(40860006L, true);
+        verify(clienteDao, times(1)).save(cliente);
     }
 
-    //busca cliente
     @Test
     public void testBuscaClientePorDni_Success() throws ClientNoExisteException {
-        ClienteService clienteServiceMock = Mockito.mock(ClienteService.class);
-        Long dni = 40860006L;
-        Cliente clienteEsperado = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.parse("1997-03-18"),
-                "2914789635", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
+        long dni = 40860006L;
+        Cliente cliente = new Cliente();
+        cliente.setDni(dni);
 
-        ClienteDto clienteEsperadoDto = new ClienteDto(clienteEsperado);
+        when(clienteDao.find(dni, true)).thenReturn(cliente);
 
-        when(clienteServiceMock.buscarClientePorDni(dni)).thenReturn(clienteEsperado);
+        Cliente resultado = clienteService.buscarClientePorDni(dni);
 
-        ClienteDto clienteObtenido = new ClienteDto(clienteServiceMock.buscarClientePorDni(dni));
-
-        assertNotNull(clienteObtenido, "El cliente no debe ser nulo");
-        assertEquals(clienteEsperadoDto.getDni(), clienteObtenido.getDni(), "El DNI del cliente debe coincidir");
-        assertEquals(clienteEsperadoDto.getNombre(), clienteObtenido.getNombre(), "El nombre del cliente debe coincidir");
-        assertEquals(clienteEsperadoDto.getApellido(), clienteObtenido.getApellido(), "El apellido del cliente debe coincidir");
-
-        System.out.println("Cliente encontrado con éxito:");
-
-        verify(clienteServiceMock, times(1)).buscarClientePorDni(dni);
+        assertNotNull(resultado);
+        assertEquals(dni, resultado.getDni());
     }
+
 
     @Test
     public void testBuscaClientePorDniNoExiste() throws ClientNoExisteException {
-        ClienteService clienteServiceMock = Mockito.mock(ClienteService.class);
-        Long dniInexistente = 99999999L;
-
-        when(clienteServiceMock.buscarClientePorDni(dniInexistente)).thenThrow(new ClientNoExisteException("El cliente no existe"));
-
-        try {
-            clienteServiceMock.buscarClientePorDni(dniInexistente);
-            fail("Se esperaba que se lanzara una excepción ClientNoExisteException");
-        } catch (ClientNoExisteException e) {
-            assertEquals("El cliente no existe", e.getMessage());
-            System.out.println("Excepción capturada: " + e.getMessage());
-        }
-
-        verify(clienteServiceMock, times(1)).buscarClientePorDni(dniInexistente);
+        long dni = 12345678L;
+        when(clienteDao.find(dni, true)).thenReturn(null);
+        ClientNoExisteException exception = assertThrows(ClientNoExisteException.class, () -> clienteService.buscarClientePorDni(dni));
+        assertEquals("El cliente no existe", exception.getMessage());
     }
 
 }
