@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cuenta")
+@RequestMapping("/api/cuenta")
 public class CuentaController {
     @Autowired
     private CuentaService cuentaService;
