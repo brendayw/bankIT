@@ -129,6 +129,13 @@ Spring Boot.
     * Error Code: 404 Not Found
         * No se han registrado cuentas.
 
+### Obtener cuenta por ID
+* Metodo: GET
+* URL: /api/cuenta/{ID}
+* Posibles errores:
+  * Error Code: 404 Not Found
+    * La cuenta con ese ID no existe.
+
 #### Obtener cuenta por DNI del cliente
 * Metodo: GET
 * URL: /api/cuenta/cliente/{dni}
