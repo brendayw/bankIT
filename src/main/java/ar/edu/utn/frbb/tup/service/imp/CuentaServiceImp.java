@@ -37,6 +37,11 @@ public class CuentaServiceImp implements CuentaService {
         validarTipoCuentaUnica(cuenta);
         validarTipoCuenta(cuenta);
         validarTipoMoneda(cuenta);
+
+        Cliente cliente = clienteService.buscarClientePorDni(cuenta.getDniTitular());
+        if (cliente == null) {
+            throw new ClientNoExisteException("El cliente no existe.");
+        }
         clienteService.agregarCuenta(cuenta, cuenta.getDniTitular());
         cuentaDao.save(cuenta);
         return cuenta;
@@ -61,23 +66,14 @@ public class CuentaServiceImp implements CuentaService {
     }
 
     @Override
-    public List<Cuenta> buscarCuentas() {
-        return cuentaDao.findAll();
+    public List<Cuenta> buscarCuentas() throws CuentaNoExisteException{
+        List<Cuenta> cuentas = cuentaDao.findAll();
+        if (cuentas.isEmpty()) {
+            throw new CuentaNoExisteException("No se encontraron cuentas.");
+        }
+        return cuentas;
     }
 
-    //actualiza balance y estado
-    @Override
-    public Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException {
-        Cuenta cuenta = obtenerCuentaExistente(id);
-        if (nuevoBalance != 0.0) {
-            cuenta.setBalance(nuevoBalance);
-        }
-        if (estado == null) {
-            cuenta.setEstado(true);
-        }
-        cuentaDao.update(cuenta);
-        return cuenta;
-    }
 
     //actualizar si el prestamo se aprueba
     @Override

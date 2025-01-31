@@ -197,7 +197,7 @@ public class PrestamoControllerTest {
 
     //obtener todos los prestamos
     @Test
-    void testBuscarPrestamos_Success() {
+    void testBuscarPrestamos_Success() throws PrestamoNoExisteException {
         Prestamo prestamo1 = new Prestamo();
         Prestamo prestamo2 = new Prestamo();
 

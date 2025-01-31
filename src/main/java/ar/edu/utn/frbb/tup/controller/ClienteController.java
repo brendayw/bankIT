@@ -33,7 +33,7 @@ public class ClienteController {
 
     //obtiene todos los clientes
     @GetMapping()
-    public List<Cliente> buscarTodosLosClientes() {
+    public List<Cliente> buscarTodosLosClientes() throws ClientNoExisteException {
         return clienteService.buscarClientes();
     }
 

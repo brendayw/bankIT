@@ -46,13 +46,20 @@ public class ClienteServiceImp implements ClienteService {
     }
 
     //buscar todos los clientes
-    public List<Cliente> buscarClientes() {
-        return clienteDao.findAll();
+    public List<Cliente> buscarClientes() throws ClientNoExisteException {
+        List<Cliente> clientes = clienteDao.findAll();
+        if (clientes.isEmpty()) {
+            throw new ClientNoExisteException("No se encontraron clientes.");
+        }
+        return clientes;
     }
 
     //delete
-    public Cliente desactivarCliente(Long dni) {
+    public Cliente desactivarCliente(Long dni) throws ClientNoExisteException {
         Cliente cliente = clienteDao.find(dni, true);
+        if (cliente == null) {
+            throw new ClientNoExisteException("El cliente no existe");
+        }
         cliente.setActivo(false);
         clienteDao.save(cliente);
         return cliente;
@@ -71,7 +78,7 @@ public class ClienteServiceImp implements ClienteService {
         }
     }
 
-    private void verificarTipoCuentaExistente(Cliente titular, Cuenta cuenta) throws TipoCuentaYaExisteException {
+    private void verificarTipoCuentaExistenteEnMoneda(Cliente titular, Cuenta cuenta) throws TipoCuentaYaExisteException {
         if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getTipoMoneda())) {
             throw new TipoCuentaYaExisteException("El cliente ya posee una cuenta de ese tipo y moneda");
         }
@@ -80,7 +87,7 @@ public class ClienteServiceImp implements ClienteService {
     //agrega una cuenta
     public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException {
         Cliente titular = clienteDao.find(dniTitular, true);
-        verificarTipoCuentaExistente(titular, cuenta);
+        verificarTipoCuentaExistenteEnMoneda(titular, cuenta);
         titular.getCuentas().add(cuenta);
         clienteDao.save(titular);
     }

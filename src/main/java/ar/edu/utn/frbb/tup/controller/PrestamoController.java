@@ -36,7 +36,7 @@ public class PrestamoController {
 
     //obtiene todos los prestamos
     @GetMapping
-    public List<Prestamo> obtenerPrestamos() {
+    public List<Prestamo> obtenerPrestamos() throws PrestamoNoExisteException {
         return prestamoService.buscarPrestamos();
     }
 

@@ -1,6 +1,5 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
@@ -40,7 +39,7 @@ public class CuentaControllerTest {
     }
 
     @Test
-    void testCrearCuenta_Success() throws ClientNoExisteException, CampoIncorrecto, TipoMonedaNoSoportada, CuentaNoSoportadaException, TipoCuentaYaExisteException, CuentaYaExisteException {
+    void testCrearCuenta_Success() throws CuentaNoExisteException, ClientNoExisteException, CampoIncorrecto, TipoMonedaNoSoportada, CuentaNoSoportadaException, TipoCuentaYaExisteException, CuentaYaExisteException {
         CuentaDto cuentaNueva = crearCuentaDto(40860006L, 100000.0, "A", "P");
 
         Cuenta cuenta = new Cuenta();
@@ -72,7 +71,7 @@ public class CuentaControllerTest {
 
     //busca todas las cuentas
     @Test
-    void testBuscarCuentas_Success() {
+    void testBuscarCuentas_Success() throws CuentaNoExisteException {
         Cuenta cuenta1 = new Cuenta();
         Cuenta cuenta2 = new Cuenta();
 

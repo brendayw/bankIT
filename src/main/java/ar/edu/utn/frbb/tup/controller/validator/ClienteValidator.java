@@ -65,6 +65,9 @@ public class ClienteValidator {
         if (clienteDto.getTipoPersona() == null || clienteDto.getTipoPersona().isEmpty()) {
             throw new CampoIncorrecto("El tipoPersona no puede ser nulo.");
         }
+        if (clienteDto.getBanco() == null || clienteDto.getBanco().isEmpty()) {
+            throw new CampoIncorrecto("El banco no puede ser nulo.");
+        }
     }
 
     private void validateDni(ClienteDto clienteDto) {

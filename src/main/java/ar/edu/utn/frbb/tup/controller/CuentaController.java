@@ -31,7 +31,7 @@ public class CuentaController {
 
     //obtiene todas las cuentas
     @GetMapping
-    public List<Cuenta> buscarCuentas() {
+    public List<Cuenta> buscarCuentas() throws CuentaNoExisteException {
         return cuentaService.buscarCuentas();
     }
 
@@ -47,11 +47,6 @@ public class CuentaController {
         return cuentaService.buscarCuentaPorCliente(dni);
     }
 
-    //actualiza cuenta
-    @PutMapping("/{id}")
-    public Cuenta actualizarCuenta(@PathVariable long id, @RequestBody Cuenta cuentaActualizado) throws CuentaNoExisteException {
-        return  cuentaService.actulizarDatosCuenta(id, cuentaActualizado.getBalance(), cuentaActualizado.isEstado());
-    }
 
     //desactiva cuenta
     @DeleteMapping("/{id}")

@@ -95,6 +95,15 @@ public class Cliente extends Persona{
         return false;
     }
 
+    public boolean tieneCuentaEnTipoCuenta(TipoCuenta tipoCuenta) {
+        for (Cuenta cuenta: cuentas) {
+            if (tipoCuenta.equals(cuenta.getTipoCuenta())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean tieneCuentaEnMoneda(TipoMoneda moneda) {
         for (Cuenta cuenta: cuentas) {
             if (moneda.equals(cuenta.getTipoMoneda())) {

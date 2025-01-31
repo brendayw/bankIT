@@ -12,8 +12,7 @@ public interface CuentaService {
     Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada;
     Cuenta buscarCuentaPorId(long id) throws CuentaNoExisteException;
     List<Cuenta> buscarCuentaPorCliente(long dni) throws ClientNoExisteException, CuentaNoExisteException;
-    List<Cuenta> buscarCuentas();
-    Cuenta actulizarDatosCuenta(long id, double nuevoBalance, Boolean estado) throws CuentaNoExisteException;
+    List<Cuenta> buscarCuentas() throws CuentaNoExisteException;
     void actualizarBalance(Prestamo prestamo) throws CuentaNoExisteException;
     Cuenta desactivarCuenta(long id) throws CuentaNoExisteException;
 }

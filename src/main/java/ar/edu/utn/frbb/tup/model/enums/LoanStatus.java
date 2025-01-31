@@ -1,10 +1,8 @@
 package ar.edu.utn.frbb.tup.model.enums;
 
 public enum LoanStatus {
-    PENDIENTE("P"),
     APROBADO("A"),
     RECHAZADO("R"),
-    DESEMBOLSADO("D"),
     CERRADO("C");
 
     private final String descripcion;

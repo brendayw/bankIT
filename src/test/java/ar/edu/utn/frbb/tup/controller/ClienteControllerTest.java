@@ -109,7 +109,7 @@ public class ClienteControllerTest {
 
     //busca todos los clientes
     @Test
-    void testBuscarClientes_Succes() {
+    void testBuscarClientes_Succes() throws ClientNoExisteException {
         Cliente cliente1 = new Cliente();
         Cliente cliente2 = new Cliente();
         cliente1.setDni(40860006L);

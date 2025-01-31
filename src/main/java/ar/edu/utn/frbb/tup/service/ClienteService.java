@@ -16,7 +16,7 @@ public interface ClienteService {
     void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException, ClientNoExisteException;
     void agregarPrestamo(Prestamo prestamo, Long dniTitular) throws ClientNoExisteException;
     Cliente buscarClientePorDni(Long dni) throws ClientNoExisteException;
-    List<Cliente> buscarClientes();
+    List<Cliente> buscarClientes() throws ClientNoExisteException;
     Cliente desactivarCliente(Long dni) throws ClientNoExisteException;
 
 
