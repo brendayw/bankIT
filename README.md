@@ -1,5 +1,4 @@
 # Simulador de Banco - Gestión de Clientes, Cuentas y Préstamos
-
 Proyecto desarrollado en Java que permite la creación de
 clientes y cuentas, así como la gestión de préstamos mediante
 Spring Boot.
@@ -10,12 +9,14 @@ Spring Boot.
 * Consultar clientes.
 * Consultar cliente por ID (dni).
 * Eliminar (desactivar) el cliente.
+
 #### Gestión de cuentas:
 * Creacion de una cuenta.
 * Consultar todas las cuentas.
 * Consultar una cuenta por ID.
 * Consultar las cuentas de un cliente por su ID.
 * Eliminar (desactivar) una cuenta.
+
 #### Gestión de préstamos:
 * Solicitar un préstamo.
 * Consultar todos los préstamos solicitados.
@@ -25,7 +26,6 @@ Spring Boot.
 * Cerrar el préstamo.
 
 ### Tecnologías Utilizadas
-
 - Java 21.0.3
 - Maven
 - Spring Boot
@@ -54,23 +54,23 @@ Spring Boot.
 
 ### Endpoints y ejemplos de uso
 
-#### Cliente
+### Cliente
 
 #### Crear Cliente: 
-* Metodo: POST
+* Método: POST
 * URL:  /api/cliente
-  * Ejemplo de input:
+* Ejemplo de input:
 
-          {
-              "nombre": "Brenda",
-              "apellido": "Yañez",
-              "dni": 40860006,
-              "fechaNacimiento": "1997-04-09",
-              "telefono": "2916897129",
-              "email": "brendayañez@gmail.com",
-              "tipoPersona": "F",
-              "banco": "Provincia"
-          }
+        {
+            "nombre": "Brenda",
+            "apellido": "Yañez",
+            "dni": 40860006,
+            "fechaNacimiento": "1997-04-09",
+            "telefono": "2916897129",
+            "email": "brendayañez@gmail.com",
+            "tipoPersona": "F",
+            "banco": "Provincia"
+        }
 * Posibles errores:
   * Error Code: 400 Bad Request
     * Campos nulos o vacíos.
@@ -80,21 +80,21 @@ Spring Boot.
     * El cliente es menor de edad.
 
 #### Obtener todos los clientes
-* Metodo: GET
+* Método: GET
 * URL: /api/cliente
 * Posibles errores:
   * Error Code: 404 Not Found
     * No se ha registrado ningun cliente.
 
 #### Obtener cliente por DNI
-* Metodo: GET
+* Método: GET
 * URL: /api/cliente/{DNI}
 * Posibles errores:
     * Error Code: 404 Not Found
         * El cliente no existe.
 
 #### Desactiva cliente
-* Metodo: DELETE
+* Método: DELETE
 * URL: /api/cliente/{DNI}
 * Posibles errores:
     * Error Code: 404 Not Found
@@ -103,16 +103,16 @@ Spring Boot.
 ### Cuenta
 
 #### Crear cuenta
-* Metodo: POST
+* Método: POST
 * URL: /api/cuenta
-  * Ejemplo de input:
+* Ejemplo de input:
   
-          {
-              "dniTitular": 40860006,
-              "balance": 100.0,
-              "tipoCuenta": "A",
-              "tipoMoneda": "P"
-          }
+        {
+            "dniTitular": 40860006,
+            "balance": 100.0,
+            "tipoCuenta": "A",
+            "tipoMoneda": "P"
+        }
 * Posibles errores:
   * Error Code: 400 Bad Request
     * Campos nulos o vacíos.
@@ -123,21 +123,21 @@ Spring Boot.
     * El cliente ya tiene una cuenta de ese tipo en ese tipo de moneda.
 
 #### Obtener todas las cuentas
-* Metodo: GET
+* Método: GET
 * URL: /api/cuenta
 * Posibles errores:
     * Error Code: 404 Not Found
         * No se han registrado cuentas.
 
-### Obtener cuenta por ID
-* Metodo: GET
+#### Obtener cuenta por ID
+* Método: GET
 * URL: /api/cuenta/{ID}
 * Posibles errores:
   * Error Code: 404 Not Found
     * La cuenta con ese ID no existe.
 
 #### Obtener cuenta por DNI del cliente
-* Metodo: GET
+* Método: GET
 * URL: /api/cuenta/cliente/{dni}
 * Posibles errores:
     * Error Code: 404 Not Found
@@ -148,17 +148,17 @@ GET /api/cuenta/cliente/{dni}
 
 ### Préstamo
 
-#### Crear Cliente:
-* Metodo: POST
+#### Solicitar préstamo:
+* Método: POST
 * URL:  /api/prestamo
-  * Ejemplo de input:
+* Ejemplo de input:
   
-          {
-              "numeroCliente": 40860006,
-              "montoPrestamo": 150000.0,
-              "tipoMoneda": "P",
-              "plazoMeses": 12
-          }
+        {
+            "numeroCliente": 40860006,
+            "montoPrestamo": 150000.0,
+            "tipoMoneda": "P",
+            "plazoMeses": 12
+        }
 * Posibles errores:
   * Error Code: 400 Bad Request
     * Campos nulos o vacios.
@@ -168,24 +168,23 @@ GET /api/cuenta/cliente/{dni}
     * El cliente no existe.
 
 #### Obtener todos los préstamos
-* Metodo: GET
+* Método: GET
 * URL: /api/prestamo
 * Posibles errores:
     * Error Code: 404 Not Found
         * No se encontraron préstamos.
 
 #### Obtener todos los préstamos por DNI del cliente
-* Metodo: GET
+* Método: GET
 * URL: /api/prestamo/{dni}
 * Posibles errores:
     * Error Code: 404 Not Found
         * El cliente no tiene préstamos registrados.
 
 #### Pagar cuota del préstamo
-    
     Para pagar una cuota del préstamo se debe tener en cuenta el ID que se imprime por terminal
 
-* Metodo: PUT
+* Método: PUT
 * URL: /api/prestamo/pagar/{id}
 * Posibles errores:
     * Error Code: 404 Not Found
@@ -193,9 +192,8 @@ GET /api/cuenta/cliente/{dni}
 
 #### Cerrar préstamo
     Para pagar una cuota del préstamo se debe tener en cuenta el ID que se imprime por terminal
-* Metodo: DELETE
+* Método: DELETE
 * URL: /api/prestamo/{ID}
 * Posibles errores:
     * Error Code: 404 Not Found
         * El préstamo con ese ID no existe.
-
