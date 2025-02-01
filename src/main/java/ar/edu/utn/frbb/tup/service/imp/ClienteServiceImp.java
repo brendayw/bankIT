@@ -4,6 +4,8 @@ import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Prestamo;
+import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
+import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClienteMayorDeEdadException;
@@ -78,16 +80,19 @@ public class ClienteServiceImp implements ClienteService {
         }
     }
 
-    private void verificarTipoCuentaExistenteEnMoneda(Cliente titular, Cuenta cuenta) throws TipoCuentaYaExisteException {
-        if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getTipoMoneda())) {
-            throw new TipoCuentaYaExisteException("El cliente ya posee una cuenta de ese tipo y moneda");
+    private void verificarTipoCuentaExistenteEnMoneda(Cliente titular, TipoCuenta tipoCuenta, TipoMoneda tipoMoneda) throws TipoCuentaYaExisteException {
+        for (Cuenta cuenta : titular.getCuentas()) {
+            if (cuenta.getTipoCuenta() == tipoCuenta && cuenta.getTipoMoneda() == tipoMoneda) {
+                throw new TipoCuentaYaExisteException(
+                        "El cliente ya posee una " + tipoCuenta + " en " + tipoMoneda + ".");
+            }
         }
     }
 
     //agrega una cuenta
     public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaYaExisteException {
         Cliente titular = clienteDao.find(dniTitular, true);
-        verificarTipoCuentaExistenteEnMoneda(titular, cuenta);
+        verificarTipoCuentaExistenteEnMoneda(titular, cuenta.getTipoCuenta(), cuenta.getTipoMoneda());
         titular.getCuentas().add(cuenta);
         clienteDao.save(titular);
     }

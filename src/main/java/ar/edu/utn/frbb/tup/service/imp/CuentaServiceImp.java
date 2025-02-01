@@ -31,9 +31,8 @@ public class CuentaServiceImp implements CuentaService {
 
     //agregar tipocuentayaexiste
     @Override
-    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws CuentaYaExisteException, TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
+    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws TipoCuentaYaExisteException, ClientNoExisteException, CuentaNoSoportadaException, TipoMonedaNoSoportada {
         Cuenta cuenta = new Cuenta(cuentaDto);
-        validarCuentaUnica(cuenta);
         validarTipoCuentaUnica(cuenta);
         validarTipoCuenta(cuenta);
         validarTipoMoneda(cuenta);
@@ -97,12 +96,6 @@ public class CuentaServiceImp implements CuentaService {
     }
 
     //otro metodos
-    private void validarCuentaUnica(Cuenta cuenta) throws CuentaYaExisteException {
-        if (cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
-            throw new CuentaYaExisteException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
-        }
-    }
-
     private void validarTipoCuentaUnica(Cuenta cuenta) throws TipoCuentaYaExisteException {
         List<Cuenta> cuentasCliente = cuentaDao.buscarCuentasByCliente(cuenta.getDniTitular());
         for (Cuenta cuentas : cuentasCliente) {

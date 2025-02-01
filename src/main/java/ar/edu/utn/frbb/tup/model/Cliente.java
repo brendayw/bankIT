@@ -85,16 +85,6 @@ public class Cliente extends Persona{
         prestamo.setDniTitular(prestamo.getDniTitular());
     }
 
-    public boolean tieneCuenta(TipoCuenta tipoCuenta, TipoMoneda moneda) {
-        for (Cuenta cuenta:
-                cuentas) {
-            if (tipoCuenta.equals(cuenta.getTipoCuenta()) && moneda.equals(cuenta.getTipoMoneda())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean tieneCuentaEnTipoCuenta(TipoCuenta tipoCuenta) {
         for (Cuenta cuenta: cuentas) {
             if (tipoCuenta.equals(cuenta.getTipoCuenta())) {
