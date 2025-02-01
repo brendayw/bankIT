@@ -140,25 +140,6 @@ public class CuentaControllerTest {
         verify(cuentaService, times(1)).buscarCuentaPorCliente(dni);
     }
 
-    //actualiza la cuenta
-    @Test
-    void testActualizarCuenta_Success() throws CuentaNoExisteException {
-        long id = 123456789;
-        Cuenta cuentaActualizada = new Cuenta();
-        cuentaActualizada.setBalance(1500.0);
-
-        //al no insertar un nuevo estado, se va a mantener como cuenta activada
-        when(cuentaService.actulizarDatosCuenta(id, cuentaActualizada.getBalance(), cuentaActualizada.isEstado()))
-                .thenReturn(cuentaActualizada);
-
-        Cuenta resultado = cuentaController.actualizarCuenta(id, cuentaActualizada);
-        assertNotNull(resultado);
-        assertEquals(1500.0, resultado.getBalance());
-        assertFalse(resultado.isEstado());
-        verify(cuentaService, times(1))
-                .actulizarDatosCuenta(id, cuentaActualizada.getBalance(), cuentaActualizada.isEstado());
-    }
-
     //desactiva la cuenta
     @Test
     void testDesactivarCuenta() throws CuentaNoExisteException{

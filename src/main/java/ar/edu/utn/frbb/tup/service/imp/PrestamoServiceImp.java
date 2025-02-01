@@ -22,14 +22,10 @@ import java.util.*;
 
 @Service
 public class PrestamoServiceImp implements PrestamoService {
-    @Autowired
-    PrestamoDao prestamoDao;
-    @Autowired
-    ClienteService clienteService;
-    @Autowired
-    CuentaService cuentaService;
-    @Autowired
-    CreditScoreService creditScoreService;
+    @Autowired PrestamoDao prestamoDao;
+    @Autowired ClienteService clienteService;
+    @Autowired CuentaService cuentaService;
+    @Autowired CreditScoreService creditScoreService;
 
     public PrestamoServiceImp(PrestamoDao prestamoDao, ClienteService clienteService, CuentaService cuentaService, CreditScoreService creditScoreService) {
         this.prestamoDao = prestamoDao;

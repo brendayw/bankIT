@@ -83,9 +83,12 @@ public class CuentaServiceTest {
     //crea cuenta
     @Test
     public void testCrearCuentaNuevo_Success() throws CuentaYaExisteException, ClientNoExisteException, TipoMonedaNoSoportada, TipoCuentaYaExisteException, CuentaNoSoportadaException {
+        Cliente clienteNuevo = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.of(1997,4,9),
+                "2914785135", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
         CuentaDto cuentaNueva = crearCuentaDto(40860006, 200000.0, "P", "C");
         Cuenta nuevaCuenta = new Cuenta(cuentaNueva);
 
+        when(clienteService.buscarClientePorDni(40860006L)).thenReturn(clienteNuevo);
         when(cuentaDao.find(anyLong())).thenReturn(null);
         doNothing().when(clienteService).agregarCuenta(any(), anyLong());
 

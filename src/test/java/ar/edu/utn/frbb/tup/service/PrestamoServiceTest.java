@@ -1,9 +1,12 @@
 package ar.edu.utn.frbb.tup.service;
 
+import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.dto.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.*;
 import ar.edu.utn.frbb.tup.model.enums.LoanStatus;
+import ar.edu.utn.frbb.tup.model.enums.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.CuentaNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.prestamo.CreditScoreException;
@@ -19,9 +22,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -50,41 +52,77 @@ public class PrestamoServiceTest {
         return prestamoDto;
     }
 
+    //metodo para crear clientes con model
+    private Cliente crearCliente(String nombre, String apellido, Long dni, LocalDate fechaNacimiento, String telefono, String email, TipoPersona tipoPersona, String banco) {
+        Cliente cliente = new Cliente();
+        cliente.setNombre(nombre);
+        cliente.setApellido(apellido);
+        cliente.setDni(dni);
+        cliente.setFechaNacimiento(fechaNacimiento);
+        cliente.setTelefono(telefono);
+        cliente.setEmail(email);
+        cliente.setTipoPersona(tipoPersona);
+        cliente.setBanco(banco);
+        cliente.setCuentas(new HashSet<>());
+        return cliente;
+    }
+
+    //metodo para crear cuenta
+    private Cuenta crearCuenta(long dniCliente, double balance, TipoMoneda tipoMoneda, TipoCuenta tipoCuenta) {
+        Cuenta cuenta = new Cuenta();
+        cuenta.setDniTitular(dniCliente);
+        cuenta.setBalance(balance);
+        cuenta.setTipoMoneda(tipoMoneda);
+        cuenta.setTipoCuenta(tipoCuenta);
+        return cuenta;
+    }
+
     //crea prestamo con exito
     @Test
     void testCrearPrestamo_Success() throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException {
-        PrestamoDto prestamoDto = crearPrestamoDto(40860006L, 150000.0, "P", 12);
-        Cliente mockCliente = mock(Cliente.class);
+        Cliente clienteNuevo = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.of(1997,4,9),
+                "2914785135", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
+        Cuenta cuentaNueva = crearCuenta(clienteNuevo.getDni(), 100000.0, TipoMoneda.PESOS, TipoCuenta.CUENTA_CORRIENTE);
 
-        when(mockCliente.tieneCuentaEnMoneda(TipoMoneda.PESOS)).thenReturn(true);
-        when(clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente())).thenReturn(mockCliente);
-        doNothing().when(creditScoreService).validarScore(mockCliente);
+        Set<Cuenta> cuentas = new HashSet<>();
+        cuentas.add(cuentaNueva);
+        clienteNuevo.setCuentas(cuentas);
+
+        PrestamoDto prestamoDto = crearPrestamoDto(clienteNuevo.getDni(), 150000.0, "P", 12);
+
+        when(clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente())).thenReturn(clienteNuevo);
+        doNothing().when(creditScoreService).validarScore(clienteNuevo);
         when(creditScoreService.calcularScore(any())).thenReturn(750);
-
-        Prestamo mockPrestamo = new Prestamo(prestamoDto, 750);
-        mockPrestamo.setLoanStatus(LoanStatus.APROBADO);
 
         PrestamoDetalle prestamoDetalle = prestamoService.darAltaPrestamo(prestamoDto);
 
         assertNotNull(prestamoDetalle);
         assertEquals(LoanStatus.APROBADO, prestamoDetalle.getEstado());
+        assertEquals("El préstamo fue aprobado.", prestamoDetalle.getMensaje());
     }
 
     //crea préstamo rechazado por score insuficiente
     @Test
     void testCrearPrestamo_Failure() throws ClientNoExisteException, CuentaNoExisteException, CreditScoreException {
-        PrestamoDto prestamoDto = crearPrestamoDto(40860006L, 150000.0, "P", 12);
-        Cliente mockCliente = mock(Cliente.class);
+        Cliente clienteNuevo = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.of(1997, 4, 9),
+                "2914785135", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
+        Cuenta cuentaNueva = crearCuenta(clienteNuevo.getDni(), 100000.0, TipoMoneda.PESOS, TipoCuenta.CUENTA_CORRIENTE);
 
-        when(mockCliente.tieneCuentaEnMoneda(TipoMoneda.PESOS)).thenReturn(true);
-        when(clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente())).thenReturn(mockCliente);
-        when(clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente())).thenReturn(mockCliente);
+        Set<Cuenta> cuentas = new HashSet<>();
+        cuentas.add(cuentaNueva);
+        clienteNuevo.setCuentas(cuentas);
+
+        PrestamoDto prestamoDto = crearPrestamoDto(40860006L, 150000.0, "P", 12);
+
+        when(clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente())).thenReturn(clienteNuevo);
+        doNothing().when(creditScoreService).validarScore(clienteNuevo);
         when(creditScoreService.calcularScore(any())).thenReturn(500);
 
         PrestamoDetalle prestamoDetalle = prestamoService.darAltaPrestamo(prestamoDto);
 
         assertNotNull(prestamoDetalle);
         assertEquals(LoanStatus.RECHAZADO, prestamoDetalle.getEstado());
+        assertEquals("El préstamo ha sido rechazado debido a una calificación crediticia insuficiente", prestamoDetalle.getMensaje());
     }
 
     //busca los prestamos por id del prestamo
