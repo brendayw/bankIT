@@ -77,7 +77,10 @@ public class CuentaServiceImp implements CuentaService {
     //actualizar si el prestamo se aprueba
     @Override
     public void actualizarBalance(Prestamo prestamo) throws CuentaNoExisteException {
-        Cuenta cuenta = cuentaDao.findByClienteYTipoMoneda(prestamo.getDniTitular(), prestamo.getMoneda().toString());
+        Cuenta cuenta = cuentaDao.findByClienteYTipoMonedaYTipoCuenta(
+                prestamo.getDniTitular(),
+                prestamo.getMoneda().toString(),
+                TipoCuenta.CUENTA_CORRIENTE.toString());
         if (cuenta == null) {
             throw new CuentaNoExisteException("La cuenta no existe.");
         }

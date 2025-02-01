@@ -9,6 +9,7 @@ import ar.edu.utn.frbb.tup.model.enums.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.enums.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.cliente.ClientNoExisteException;
 import ar.edu.utn.frbb.tup.model.exception.cuenta.*;
+import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import ar.edu.utn.frbb.tup.service.imp.ClienteServiceImp;
 import ar.edu.utn.frbb.tup.service.imp.CuentaServiceImp;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +39,7 @@ import static org.mockito.Mockito.*;
 public class CuentaServiceTest {
 
     @Mock private CuentaDao cuentaDao;
+    @Mock private ClienteDao clienteDao;
     @Mock private ClienteServiceImp clienteService;
     @InjectMocks private CuentaServiceImp cuentaService;
 
@@ -82,14 +85,13 @@ public class CuentaServiceTest {
 
     //crea cuenta
     @Test
-    public void testCrearCuentaNuevo_Success() throws CuentaYaExisteException, ClientNoExisteException, TipoMonedaNoSoportada, TipoCuentaYaExisteException, CuentaNoSoportadaException {
+    public void testCrearCuentaNuevo_Success() throws ClientNoExisteException, TipoMonedaNoSoportada, TipoCuentaYaExisteException, CuentaNoSoportadaException {
         Cliente clienteNuevo = crearCliente("Brenda", "Yañez", 40860006L, LocalDate.of(1997,4,9),
                 "2914785135", "brendayañez@gmail.com", TipoPersona.PERSONA_FISICA, "Nacion");
         CuentaDto cuentaNueva = crearCuentaDto(40860006, 200000.0, "P", "C");
         Cuenta nuevaCuenta = new Cuenta(cuentaNueva);
 
         when(clienteService.buscarClientePorDni(40860006L)).thenReturn(clienteNuevo);
-        when(cuentaDao.find(anyLong())).thenReturn(null);
         doNothing().when(clienteService).agregarCuenta(any(), anyLong());
 
         Cuenta resultado = cuentaService.darDeAltaCuenta(cuentaNueva);
@@ -100,15 +102,15 @@ public class CuentaServiceTest {
         verify(cuentaDao, times(1)).save(any(Cuenta.class));
     }
 
-    //cuenta ya existe
+    //tipo cuenta ya existe
     @Test
     public void testCrearCuentaNuevo_Failure() {
-        CuentaDto cuentaNueva = crearCuentaDto(40860006, 200000.0, "P", "C");
-        Cuenta nueva = new Cuenta();
+        CuentaDto cuentaNueva = crearCuentaDto(40860006L, 200000.0, "P", "C");
+        Cuenta cuentaExistente = new Cuenta(cuentaNueva);
 
-        when(cuentaDao.find(anyLong())).thenReturn(nueva);
-        assertThrows(CuentaYaExisteException.class, () -> cuentaService.darDeAltaCuenta(cuentaNueva));
+        when(cuentaDao.buscarCuentasByCliente(40860006L)).thenReturn(Arrays.asList(cuentaExistente));
 
+        assertThrows(TipoCuentaYaExisteException.class, () -> cuentaService.darDeAltaCuenta(cuentaNueva));
         verify(cuentaDao, times(0)).save(any(Cuenta.class));
     }
 
@@ -174,6 +176,7 @@ public class CuentaServiceTest {
         Long dniTitular = 40860006L;
         TipoMoneda moneda = TipoMoneda.PESOS;
         double montoSolicitado = 1500.0;
+        TipoCuenta tipoCuenta = TipoCuenta.CUENTA_CORRIENTE;
 
         Cuenta cuenta = crearCuenta(dniTitular, 2000.0, moneda, TipoCuenta.CUENTA_CORRIENTE);
 
@@ -182,7 +185,7 @@ public class CuentaServiceTest {
         prestamo.setMontoSolicitado(montoSolicitado);
         prestamo.setMoneda(moneda);
 
-        when(cuentaDao.findByClienteYTipoMoneda(dniTitular, moneda.toString())).thenReturn(cuenta);
+        when(cuentaDao.findByClienteYTipoMonedaYTipoCuenta(dniTitular, moneda.toString(), tipoCuenta.toString())).thenReturn(cuenta);
         cuentaService.actualizarBalance(prestamo);
 
         assertEquals(3500.0, cuenta.getBalance(), 0.01); // 2000 + 1500 = 3500
@@ -195,13 +198,14 @@ public class CuentaServiceTest {
         Long dniTitular = 40860006L;
         TipoMoneda moneda = TipoMoneda.PESOS;
         double montoSolicitado = 1500.0;
+        TipoCuenta cuenta = TipoCuenta.CUENTA_CORRIENTE;
 
         Prestamo prestamo = new Prestamo();
         prestamo.setDniTitular(dniTitular);
         prestamo.setMontoSolicitado(montoSolicitado);
         prestamo.setMoneda(moneda);
 
-        when(cuentaDao.findByClienteYTipoMoneda(dniTitular, moneda.toString())).thenReturn(null);
+        when(cuentaDao.findByClienteYTipoMonedaYTipoCuenta(dniTitular, moneda.toString(), cuenta.toString())).thenReturn(null);
         assertThrows(CuentaNoExisteException.class, () -> cuentaService.actualizarBalance(prestamo));
 
         verify(cuentaDao, times(0)).save(any(Cuenta.class));

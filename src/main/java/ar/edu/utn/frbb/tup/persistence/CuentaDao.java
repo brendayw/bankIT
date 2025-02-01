@@ -7,7 +7,7 @@ import java.util.List;
 public interface CuentaDao {
     Cuenta find(long id);
     List<Cuenta> findAll();
-    Cuenta findByClienteYTipoMoneda(long dni, String tipoMoneda);
+    Cuenta findByClienteYTipoMonedaYTipoCuenta(long dni, String tipoMoneda, String tipoCuenta);
     void save(Cuenta cuenta);
     List<Cuenta> buscarCuentasByCliente(long dni);
     Cuenta update(Cuenta cuenta);

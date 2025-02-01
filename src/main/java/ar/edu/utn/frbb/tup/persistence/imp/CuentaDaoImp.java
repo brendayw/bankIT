@@ -33,10 +33,11 @@ public class CuentaDaoImp extends AbstractBaseDao implements CuentaDao {
     }
 
     //busca si el cliente tiene la cuenta en esa moneda
-    public Cuenta findByClienteYTipoMoneda(long dni, String tipoMoneda) {
+    public Cuenta findByClienteYTipoMonedaYTipoCuenta(long dni, String tipoMoneda, String tipoCuenta) {
         List<Cuenta> cuentas = findAll();
         for (Cuenta cuenta : cuentas) {
-            if (cuenta.getDniTitular() == dni && cuenta.getTipoMoneda().toString().equals(tipoMoneda)) {
+            if (cuenta.getDniTitular() == dni && cuenta.getTipoMoneda().toString().equals(tipoMoneda)
+                && cuenta.getTipoCuenta().toString().equals(tipoCuenta)) {
                 return cuenta;
             }
         }
