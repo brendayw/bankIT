@@ -158,7 +158,7 @@ public class PrestamoServiceTest {
         cliente.setDni(dniCliente);
 
         Prestamo prestamo1 = new Prestamo();
-        prestamo1.setId(1L);
+        prestamo1.setId(123456789L);
         prestamo1.setDniTitular(dniCliente);
         prestamo1.setLoanStatus(LoanStatus.APROBADO);
         prestamo1.setMonto(100000.0);
@@ -167,7 +167,7 @@ public class PrestamoServiceTest {
         prestamo1.setSaldoRestante(50000.0);
 
         Prestamo prestamo2 = new Prestamo();
-        prestamo2.setId(2L);
+        prestamo2.setId(23456789L);
         prestamo2.setDniTitular(dniCliente);
         prestamo2.setLoanStatus(LoanStatus.APROBADO);
         prestamo2.setMonto(50000.0);
@@ -192,7 +192,7 @@ public class PrestamoServiceTest {
         assertEquals(20000.0, respuesta.getPrestamoResume().get(1).getSaldoRestante(), "El saldo restante del segundo préstamo no coincide");
 
         verify(clienteService, times(1)).buscarClientePorDni(dniCliente);
-        verify(prestamoDao, times(2)).buscarPrestamoPorCliente(dniCliente);
+        verify(prestamoDao, times(1)).buscarPrestamoPorCliente(dniCliente);
     }
 
     @Test

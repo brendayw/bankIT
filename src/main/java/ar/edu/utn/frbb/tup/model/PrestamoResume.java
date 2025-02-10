@@ -48,7 +48,7 @@ public class PrestamoResume {
     }
 
     public String toString() {
-        return "PrestamoResume: " +
+        return "Prestamo: " +
                 "\n monto: " + monto +
                 "\n plazo meses: " + plazoMeses +
                 "\n pagosrealizados: " + pagosRealizados +

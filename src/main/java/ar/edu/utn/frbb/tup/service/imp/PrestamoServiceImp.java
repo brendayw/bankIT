@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PrestamoServiceImp implements PrestamoService {
@@ -77,20 +78,30 @@ public class PrestamoServiceImp implements PrestamoService {
         Prestamo prestamo = obtenerPrestamoAprobado(prestamoDto.getNumeroCliente(), id);
         validarCuentaCliente(prestamoDto.getNumeroCliente(), prestamoDto.getTipoMoneda());
         pagarCuotaPrestamo(prestamo);
-        return generarRespuestaPrestamos(prestamoDto.getNumeroCliente());
+
+        List<Prestamo> prestamosAprobados = prestamoDao.buscarPrestamoPorCliente(prestamoDto.getNumeroCliente()).stream()
+                .filter(p -> p.getLoanStatus() == LoanStatus.APROBADO)
+                .collect(Collectors.toList());
+
+        return generarRespuestaPrestamos(prestamoDto.getNumeroCliente(), prestamosAprobados);
     }
 
     //GET - obtiene el prestamo por dni o numero de cliente -> OK (refactorizado)
     @Override
     public PrestamoRespuesta prestamosPorCliente(long numeroCliente) throws ClientNoExisteException, PrestamoNoExisteException {
         Cliente cliente = obtenerClientePorDni(numeroCliente);
+        if (cliente == null) {
+            throw new ClientNoExisteException("El cliente no existe.");
+        }
         List<Prestamo> prestamos = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
-
-        if (prestamos.isEmpty()) {
-            throw new PrestamoNoExisteException("El cliente no tiene préstamos registrados.");
+        List<Prestamo> prestamosAprobados = prestamos.stream()
+                .filter(p -> p.getLoanStatus() == LoanStatus.APROBADO)
+                .collect(Collectors.toList());
+        if (prestamosAprobados.isEmpty()) {
+            throw new PrestamoNoExisteException("El cliente no tiene préstamos aprobados.");
         }
 
-        return generarRespuestaPrestamos(numeroCliente);
+        return generarRespuestaPrestamos(numeroCliente, prestamosAprobados);
     }
 
     //DELETE - cierra el prestamo (refactorizado)
@@ -117,13 +128,17 @@ public class PrestamoServiceImp implements PrestamoService {
     public void validarCuentaCliente(long dni, String tipoMoneda) throws CuentaNoExisteException, ClientNoExisteException {
         Cliente cliente = clienteService.buscarClientePorDni(dni);
 
-        Cuenta cuenta = cliente.getCuentas().iterator().next();
-        TipoCuenta tipoCuentaCliente = cuenta.getTipoCuenta();
-
-        if (!cliente.tieneCuentaEnMoneda(TipoMoneda.fromString(tipoMoneda)) && !cliente.tieneCuentaEnTipoCuenta(tipoCuentaCliente)) {
-            throw new CuentaNoExisteException("El cliente no tiene cuenta en la moneda especificada.");
+        if (cliente.getCuentas().isEmpty()) {
+            throw new CuentaNoExisteException("El cliente no tiene cuentas registradas.");
         }
 
+        boolean cuentaValida = cliente.getCuentas().stream()
+                .anyMatch(cuenta -> cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE
+                && cuenta.getTipoMoneda() == TipoMoneda.fromString(tipoMoneda));
+
+        if (!cuentaValida) {
+            throw new CuentaNoExisteException("El cliente no tiene una cuenta corriente en la moneda especificada.");
+        }
     }
 
     private Prestamo obtenerPrestamoPorId(long id) throws PrestamoNoExisteException {
@@ -183,8 +198,7 @@ public class PrestamoServiceImp implements PrestamoService {
     }
 
     //ok
-    public PrestamoRespuesta generarRespuestaPrestamos(long numeroCliente) {
-        List<Prestamo> prestamos = prestamoDao.buscarPrestamoPorCliente(numeroCliente);
+    public PrestamoRespuesta generarRespuestaPrestamos(long numeroCliente, List<Prestamo> prestamos) {
         List<PrestamoResume> resumenPrestamos = new ArrayList<>();
         for (Prestamo prestamo : prestamos) {
             resumenPrestamos.add(new PrestamoResume(

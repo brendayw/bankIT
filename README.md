@@ -164,7 +164,7 @@ GET /api/cuenta/cliente/{dni}
     * Campos nulos o vacios.
     * Tipo de datos no válidos (tipoMoneda).
   * Error Code: 404 Not Found
-    * El cliente no tiene cuenta en la moneda especificada.
+    * El cliente no tiene una cuenta corriente en la moneda especificada.
     * El cliente no existe.
 
 #### Obtener todos los préstamos
@@ -186,9 +186,16 @@ GET /api/cuenta/cliente/{dni}
 
 * Método: PUT
 * URL: /api/prestamo/pagar/{id}
+  * Ejemplo de input:
+
+        {
+            "numeroCliente": 40860006,
+            "tipoMoneda": "P"
+        }
 * Posibles errores:
     * Error Code: 404 Not Found
         *  No se encontró un préstamo aprobado con ese ID.
+
 
 #### Cerrar préstamo
     Para pagar una cuota del préstamo se debe tener en cuenta el ID que se imprime por terminal
