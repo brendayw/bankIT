@@ -1,10 +1,10 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import ar.edu.utn.frbb.tup.model.cliente.dto.ClientDetailsDto;
-import ar.edu.utn.frbb.tup.model.cliente.dto.ClientDto;
-import ar.edu.utn.frbb.tup.model.cliente.dto.UpdateClientDto;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDto;
-import ar.edu.utn.frbb.tup.model.prestamo.dto.LoansListDto;
+import ar.edu.utn.frbb.tup.model.client.dto.ClientDetailsDto;
+import ar.edu.utn.frbb.tup.model.client.dto.ClientDto;
+import ar.edu.utn.frbb.tup.model.client.dto.UpdateClientDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
+import ar.edu.utn.frbb.tup.model.loan.dto.LoansListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.service.ClientService;
 import io.swagger.v3.oas.annotations.Parameter;

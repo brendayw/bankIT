@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.model.users;
 
-import ar.edu.utn.frbb.tup.model.cliente.Client;
+import ar.edu.utn.frbb.tup.model.client.Client;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

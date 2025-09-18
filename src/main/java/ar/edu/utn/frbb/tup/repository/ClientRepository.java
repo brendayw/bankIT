@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.repository;
 
-import ar.edu.utn.frbb.tup.model.cliente.Client;
+import ar.edu.utn.frbb.tup.model.client.Client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

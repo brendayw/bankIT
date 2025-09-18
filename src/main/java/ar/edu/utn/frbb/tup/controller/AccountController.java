@@ -1,8 +1,8 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDetailsDto;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDto;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountsListDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDetailsDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountsListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 
 import ar.edu.utn.frbb.tup.service.AccountService;

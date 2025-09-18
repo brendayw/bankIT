@@ -1,13 +1,13 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.infra.exception.ValidacionException;
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.cuenta.Account;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDetailsDto;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDto;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountsListDto;
-import ar.edu.utn.frbb.tup.model.cuenta.exceptions.CuentaNoExisteException;
-import ar.edu.utn.frbb.tup.model.cuenta.exceptions.CuentaYaExisteException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.account.Account;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDetailsDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountsListDto;
+import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaNoExisteException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaYaExisteException;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;

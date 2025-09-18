@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.model.payment;
 
-import ar.edu.utn.frbb.tup.model.prestamo.Loan;
+import ar.edu.utn.frbb.tup.model.loan.Loan;
 import jakarta.persistence.*;
 import lombok.*;
 

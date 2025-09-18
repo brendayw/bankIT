@@ -1,11 +1,9 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import ar.edu.utn.frbb.tup.model.users.AuthenticationDto;
+import ar.edu.utn.frbb.tup.model.users.dto.AuthenticationDto;
 import ar.edu.utn.frbb.tup.model.users.User;
-import ar.edu.utn.frbb.tup.model.users.TokenJWTDto;
+import ar.edu.utn.frbb.tup.model.users.dto.TokenJWTDto;
 import ar.edu.utn.frbb.tup.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")

@@ -1,10 +1,11 @@
 package ar.edu.utn.frbb.tup.infra.exception;
 
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.cuenta.exceptions.CuentaYaExisteException;
-import ar.edu.utn.frbb.tup.model.cuenta.exceptions.TipoCuentaYaExisteException;
-import ar.edu.utn.frbb.tup.model.prestamo.exceptions.PrestamoNoExisteException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaNoExisteException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaYaExisteException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.TipoCuentaYaExisteException;
+import ar.edu.utn.frbb.tup.model.loan.exceptions.PrestamoNoExisteException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -34,7 +35,7 @@ public class GestorDeErrores {
 
     }
 
-    @ExceptionHandler({ClientNoExisteException.class, PrestamoNoExisteException.class})
+    @ExceptionHandler({ClientNoExisteException.class, CuentaNoExisteException.class, PrestamoNoExisteException.class})
     public ResponseEntity<String> gestionarClienteOPrestamoNoEncontrado(RuntimeException e) {
         return ResponseEntity.status(404).body(e.getMessage());
     }

@@ -1,16 +1,15 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.infra.exception.ValidacionException;
-import ar.edu.utn.frbb.tup.model.cliente.Client;
-import ar.edu.utn.frbb.tup.model.cliente.dto.ClientDetailsDto;
-import ar.edu.utn.frbb.tup.model.cliente.dto.ClientDto;
-import ar.edu.utn.frbb.tup.model.cliente.dto.ClientsListDto;
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.cuenta.Account;
-import ar.edu.utn.frbb.tup.model.cuenta.dto.AccountDto;
-import ar.edu.utn.frbb.tup.model.prestamo.Loan;
-import ar.edu.utn.frbb.tup.model.prestamo.dto.LoansListDto;
+import ar.edu.utn.frbb.tup.model.client.Client;
+import ar.edu.utn.frbb.tup.model.client.dto.ClientDetailsDto;
+import ar.edu.utn.frbb.tup.model.client.dto.ClientDto;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.account.Account;
+import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
+import ar.edu.utn.frbb.tup.model.loan.Loan;
+import ar.edu.utn.frbb.tup.model.loan.dto.LoansListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;

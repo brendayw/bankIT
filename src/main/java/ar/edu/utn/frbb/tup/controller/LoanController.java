@@ -1,15 +1,15 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import ar.edu.utn.frbb.tup.model.cliente.exceptions.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.prestamo.Loan;
-import ar.edu.utn.frbb.tup.model.prestamo.dto.LoanDetailsDto;
-import ar.edu.utn.frbb.tup.model.prestamo.dto.LoanRequestDto;
-import ar.edu.utn.frbb.tup.model.prestamo.dto.LoansListDto;
-import ar.edu.utn.frbb.tup.model.prestamo.exceptions.CreditScoreException;
-import ar.edu.utn.frbb.tup.model.prestamo.exceptions.PrestamoNoExisteException;
-import ar.edu.utn.frbb.tup.model.payment.UpdatePaymentDto;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.model.loan.Loan;
+import ar.edu.utn.frbb.tup.model.loan.dto.LoanDetailsDto;
+import ar.edu.utn.frbb.tup.model.loan.dto.LoanRequestDto;
+import ar.edu.utn.frbb.tup.model.loan.dto.LoansListDto;
+import ar.edu.utn.frbb.tup.model.loan.exceptions.CreditScoreException;
+import ar.edu.utn.frbb.tup.model.loan.exceptions.PrestamoNoExisteException;
+import ar.edu.utn.frbb.tup.model.payment.dto.UpdatePaymentDto;
 import ar.edu.utn.frbb.tup.model.users.User;
-import ar.edu.utn.frbb.tup.service.loans.LoanService;
+import ar.edu.utn.frbb.tup.service.loan.LoanService;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

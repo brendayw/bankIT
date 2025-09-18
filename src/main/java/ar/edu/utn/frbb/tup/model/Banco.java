@@ -1,7 +1,7 @@
 package ar.edu.utn.frbb.tup.model;
 
-import ar.edu.utn.frbb.tup.model.cliente.Client;
-import ar.edu.utn.frbb.tup.model.cuenta.Account;
+import ar.edu.utn.frbb.tup.model.client.Client;
+import ar.edu.utn.frbb.tup.model.account.Account;
 
 import java.util.ArrayList;
 import java.util.List;
