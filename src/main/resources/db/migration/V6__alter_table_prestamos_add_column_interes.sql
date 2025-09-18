@@ -1,0 +1,1 @@
+ALTER TABLE prestamos ADD COLUMN interes DOUBLE;

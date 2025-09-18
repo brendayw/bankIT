@@ -1,0 +1,1 @@
+ALTER TABLE cuentas CHANGE cliente_id client_id BIGINT;
