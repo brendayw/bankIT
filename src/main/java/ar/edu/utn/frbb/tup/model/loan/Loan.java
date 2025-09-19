@@ -1,8 +1,8 @@
 package ar.edu.utn.frbb.tup.model.loan;
 
 import ar.edu.utn.frbb.tup.model.client.Client;
-import ar.edu.utn.frbb.tup.model.account.enums.TipoCuenta;
-import ar.edu.utn.frbb.tup.model.account.enums.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.account.enums.AccountType;
+import ar.edu.utn.frbb.tup.model.account.enums.CurrencyType;
 import ar.edu.utn.frbb.tup.model.loan.dto.LoanRequestDto;
 import ar.edu.utn.frbb.tup.model.loan.enums.LoanStatus;
 import ar.edu.utn.frbb.tup.model.payment.Payment;
@@ -31,19 +31,21 @@ public class Loan {
     private Client client; //del cliente
 
     @Column(name = "monto_solicitado")
-    private Double montoSolicitado;
+    private Double requestedAmount;
 
     @Column(name = "monto_total")
-    private Double montoTotal; //con intereses calculados
+    private Double totalAmount; //con intereses calculados
 
     @Enumerated(EnumType.STRING)
-    private TipoMoneda moneda;
+    @Column(name = "moneda")
+    private CurrencyType currencyType;
 
     @Enumerated(EnumType.STRING)
-    private TipoCuenta cuenta;
+    @Column(name = "cuenta")
+    private AccountType accountType;
 
     @Column(name = "plazo_meses")
-    private int plazoMeses;
+    private int termInMonths;
 
     private double interes;
 
@@ -51,7 +53,7 @@ public class Loan {
     private LoanStatus loanStatus;
 
     @Column(name = "fecha_alta")
-    private LocalDate fechaAlta;
+    private LocalDate registrationDate;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> cuotas = new ArrayList<>();
@@ -63,19 +65,19 @@ public class Loan {
     public Loan(LoanRequestDto dto, Client client) {
         this.id = null;
         this.client = client;
-        this.montoSolicitado = dto.montoSolicitado();
-        this.moneda = dto.tipoMoneda();
-        this.cuenta = dto.tipoCuenta();
-        this.plazoMeses = dto.plazoMeses();
+        this.requestedAmount = dto.requestedAmount();
+        this.currencyType = dto.currencyType();
+        this.accountType = dto.accountType();
+        this.termInMonths = dto.termInMonths();
     }
 
     @Override
     public String toString() {
-        return "Prestamo: " +
-                "\nId del prestamo: " + id +
-                "\nMoneda: " + moneda +
-                "\nCuenta: " + cuenta +
-                "\nPlazo en meses: " + plazoMeses;
+        return "Loan: " +
+                "\nId: " + id +
+                "\nCurrency Type: " + currencyType +
+                "\nAccount Type: " + accountType +
+                "\nTerm In Months: " + termInMonths;
     }
 
     public void close() {

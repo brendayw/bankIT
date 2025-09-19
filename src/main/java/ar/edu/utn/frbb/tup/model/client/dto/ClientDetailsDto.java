@@ -2,7 +2,7 @@ package ar.edu.utn.frbb.tup.model.client.dto;
 
 import ar.edu.utn.frbb.tup.model.client.Client;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDetailsDto;
-import ar.edu.utn.frbb.tup.model.person.enums.TipoPersona;
+import ar.edu.utn.frbb.tup.model.person.enums.PersonType;
 import ar.edu.utn.frbb.tup.model.loan.dto.LoanResponseDto;
 
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ public record ClientDetailsDto(
         String nombre,
         String telefono,
         String email,
-        TipoPersona tipoPersona,
+        PersonType personType,
         LocalDate fechaAlta,
         Set<AccountDetailsDto> cuentas,
         Set<LoanResponseDto> prestamos
@@ -24,20 +24,20 @@ public record ClientDetailsDto(
     public ClientDetailsDto(Client client) {
         this(
                 client.getId(),
-                client.getPersona().getDni(),
-                client.getPersona().getApellido(),
-                client.getPersona().getNombre(),
-                client.getPersona().getTelefono(),
-                client.getPersona().getEmail(),
-                client.getTipoPersona(),
-                client.getFechaAlta(),
-                client.getCuentas()
+                client.getPerson().getDni(),
+                client.getPerson().getApellido(),
+                client.getPerson().getNombre(),
+                client.getPerson().getTelefono(),
+                client.getPerson().getEmail(),
+                client.getPersonType(),
+                client.getRegistrationDate(),
+                client.getAccounts()
                         .stream()
-                        .map(AccountDetailsDto::new) // ⚡ aquí se usa el constructor correcto
+                        .map(AccountDetailsDto::new)
                         .collect(Collectors.toSet()),
-                client.getPrestamos()
+                client.getLoans()
                         .stream()
-                        .map(LoanResponseDto::new) // convierte Loan → LoanResponseDto
+                        .map(LoanResponseDto::new)
                         .collect(Collectors.toSet())
         );
     }

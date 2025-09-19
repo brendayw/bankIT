@@ -31,7 +31,7 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Persona: " +
+        return "Person: " +
                 "\ndni=" + dni +
                 "\napellido=" + apellido +
                 "\nnombre=" + nombre +
@@ -40,4 +40,3 @@ public class Person {
                 "\nemail='" + email;
     }
 }
-

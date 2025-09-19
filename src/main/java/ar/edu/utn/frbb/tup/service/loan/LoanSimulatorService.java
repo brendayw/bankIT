@@ -34,28 +34,27 @@ public class LoanSimulatorService {
 
     //crear el loan
     public Loan createLoan(Client client, LoanRequestDto request) throws CreditScoreException {
-        int score = creditScoreService.calculateScore(new HashSet<>(client.getPrestamos()));
-        System.out.println("[INFO] Score calculado para el cliente " + client.getPersona().getDni() + ": " + score);
+        int score = creditScoreService.calculateScore(new HashSet<>(client.getLoans()));
+        //System.out.println("[INFO] Score calculado para el cliente " + client.getPerson().getDni() + ": " + score);
 
         Loan loan = new Loan();
         loan.setClient(client);
-        loan.setMontoSolicitado(request.montoSolicitado());
-        loan.setPlazoMeses(request.plazoMeses());
-        loan.setMoneda(request.tipoMoneda());
-        loan.setCuenta(request.tipoCuenta());
-        loan.setFechaAlta(LocalDate.now());
+        loan.setRequestedAmount(request.requestedAmount());
+        loan.setTermInMonths(request.termInMonths());
+        loan.setCurrencyType(request.currencyType());
+        loan.setAccountType(request.accountType());
+        loan.setRegistrationDate(LocalDate.now());
 
         if (score < 600) {
             loan.setLoanStatus(LoanStatus.RECHAZADO);
-            loan.setMontoTotal(0.0);
+            loan.setTotalAmount(0.0);
             return loan;
         } else {
             loan.setLoanStatus(LoanStatus.APROBADO);
-            Double interes = calculateRate(request.montoSolicitado(), request.plazoMeses());
+            Double interes = calculateRate(request.requestedAmount(), request.termInMonths());
             loan.setInteres(interes);
-            loan.setMontoTotal(request.montoSolicitado() + interes);
+            loan.setTotalAmount(request.requestedAmount() + interes);
         }
-
         return loan;
     }
 

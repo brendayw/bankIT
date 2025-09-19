@@ -1,11 +1,11 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.infra.exception.ValidacionException;
+import ar.edu.utn.frbb.tup.infra.exception.ValidationException;
 import ar.edu.utn.frbb.tup.model.client.Client;
 import ar.edu.utn.frbb.tup.model.client.dto.ClientDetailsDto;
 import ar.edu.utn.frbb.tup.model.client.dto.ClientDto;
-import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
-import ar.edu.utn.frbb.tup.model.client.exceptions.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNotFoundException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.account.Account;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import ar.edu.utn.frbb.tup.model.loan.Loan;
@@ -36,26 +36,20 @@ public class ClientService {
     private UserRepository userRepository;
 
     public Client createClient(ClientDto dto, User user) {
-        if (repository.existsByPersonaDni(dto.persona().dni())) {
-            throw new ClienteAlreadyExistsException("El cliente con DNI " + dto.persona().dni() + " ya existe.");
+        if (repository.existsByPersonDni(dto.person().dni())) {
+            throw new ClientAlreadyExistsException("El cliente con DNI " + dto.person().dni() + " ya existe.");
         }
-
         Client client = new Client(dto);
         client.setUser(user);
         user.setClient(client);
         return repository.save(client);
     }
 
-    //obtener todos los clientes
-//    public Page<ClientsListDto> findAllClients(Pageable pagination) {
-//        return repository.findByActiveTrue(pagination).map(ClientsListDto::new);
-//    }
-
     //obtener propio perfil
     public ClientDetailsDto getOwnClientProfile(User authenticatedUser) {
         var client = authenticatedUser.getClient();
         if (client == null) {
-            throw new ValidacionException("El usuario no tiene cliente asociado");
+            throw new ValidationException("El usuario no tiene cliente asociado");
         }
         return new ClientDetailsDto(client);
     }
@@ -64,9 +58,9 @@ public class ClientService {
     public Page<LoansListDto> findAllLoansByAuthenticatedClient(User authenticatedUser, Pageable pagination) {
         var client = authenticatedUser.getClient();
         if (client == null) {
-            throw new ValidacionException("El usuario no tiene cliente asociado");
+            throw new ValidationException("El usuario no tiene cliente asociado");
         }
-        Page<Loan> loans = loanRepository.findByClientPersonaDni(client.getPersona().getDni(), pagination);
+        Page<Loan> loans = loanRepository.findByClientPersonDni(client.getPerson().getDni(), pagination);
         return loans.map(LoansListDto::new);
     }
 
@@ -74,10 +68,10 @@ public class ClientService {
     public Page<AccountDto> findAllAccountsByAuthenticatedClient(User authenticatedUser, Pageable pagination) {
         var client = authenticatedUser.getClient();
         if (client == null) {
-            throw new ValidacionException("El usuario no tiene cliente asociado");
+            throw new ValidationException("El usuario no tiene cliente asociado");
         }
-        Page<Account> accounts = accountRepository.findAccountsByClientPersonaDniAndActiveTrue(
-                client.getPersona().getDni(), pagination);
+        Page<Account> accounts = accountRepository.findAccountsByClientPersonDniAndActiveTrue(
+                client.getPerson().getDni(), pagination);
         return accounts.map(AccountDto::new);
     }
 
@@ -85,13 +79,13 @@ public class ClientService {
     public ClientDetailsDto updateOwnClientDetails(User authenticatedUser, String telefono, String email) {
         var client = authenticatedUser.getClient();
         if (client == null) {
-            throw new ValidacionException("El usuario no tiene un cliente asociado");
+            throw new ValidationException("El usuario no tiene un cliente asociado");
         }
         if (telefono != null && !telefono.isBlank()) {
-            client.getPersona().setTelefono(telefono);
+            client.getPerson().setTelefono(telefono);
         }
         if (email != null && !email.isBlank()) {
-            client.getPersona().setEmail(email);
+            client.getPerson().setEmail(email);
         }
         repository.save(client);
         return new ClientDetailsDto(client);
@@ -101,11 +95,9 @@ public class ClientService {
     public void deactivateOwnClient(User authenticatedUser) {
         var client = authenticatedUser.getClient();
         if (client == null) {
-            throw new ClientNoExisteException("El usuario no tiene un cliente asociado");
+            throw new ClientNotFoundException("El usuario no tiene un cliente asociado");
         }
         client.deactivate();
         repository.save(client);
     }
-
-
 }

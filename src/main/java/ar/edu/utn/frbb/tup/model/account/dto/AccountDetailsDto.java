@@ -1,21 +1,21 @@
 package ar.edu.utn.frbb.tup.model.account.dto;
 
 import ar.edu.utn.frbb.tup.model.account.Account;
-import ar.edu.utn.frbb.tup.model.account.enums.TipoCuenta;
-import ar.edu.utn.frbb.tup.model.account.enums.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.account.enums.AccountType;
+import ar.edu.utn.frbb.tup.model.account.enums.CurrencyType;
 
 public record AccountDetailsDto(
         Long id,
         Double balance,
-        TipoCuenta tipoCuenta,
-        TipoMoneda tipoMoneda
+        AccountType accountType,
+        CurrencyType currencyType
 ) {
     public AccountDetailsDto(Account account) {
         this(
                 account.getId(),
                 account.getBalance(),
-                account.getTipoCuenta(),
-                account.getTipoMoneda()
+                account.getAccountType(),
+                account.getCurrencyType()
         );
     }
 }

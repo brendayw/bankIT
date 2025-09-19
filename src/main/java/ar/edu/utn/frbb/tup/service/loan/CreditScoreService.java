@@ -22,16 +22,4 @@ public class CreditScoreService {
         }
         return Math.max(MIN_SCORE, Math.min(score, MAX_SCORE));
     }
-
-//    public void validateScore(Client cliente) throws CreditScoreException {
-//        Set<Loan> prestamosList = new HashSet<>(cliente.getPrestamos());
-//        int score = calculateScore(prestamosList);
-//        if (score < SCORE_MINIMO) {
-//            throw new CreditScoreException("El cliente no tiene puntaje suficiente para solicitar el préstamo.
-//            Puntaje: " + score);
-//        }
-//    }
-
 }
-
-

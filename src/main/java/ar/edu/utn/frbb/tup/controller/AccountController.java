@@ -4,7 +4,6 @@ import ar.edu.utn.frbb.tup.model.account.dto.AccountDetailsDto;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountsListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
-
 import ar.edu.utn.frbb.tup.service.AccountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/cuentas")
+@RequestMapping("/api/accounts")
 @SecurityRequirement(name = "bearer-key")
 public class AccountController {
 
@@ -30,15 +29,15 @@ public class AccountController {
     @Transactional
     @PostMapping
     public ResponseEntity register(@RequestBody @Valid AccountDto dto, UriComponentsBuilder uriComponentsBuilder) {
-        var account = service.createAccount(dto.dniTitular(), dto);
-        var uri = uriComponentsBuilder.path("/api/cuenta/{id}").buildAndExpand(account.getId()).toUri();
+        var account = service.createAccount(dto.dni(), dto);
+        var uri = uriComponentsBuilder.path("/api/accounts/{id}").buildAndExpand(account.getId()).toUri();
         return ResponseEntity.created(uri).body(new AccountDetailsDto(account));
     }
 
     //busca cuenta por numero de cuenta
     @GetMapping("/{id}")
     public ResponseEntity getAccountById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        AccountDetailsDto account = service.getAccountById(id, user);
+        AccountDetailsDto account = service.findAccountById(id, user);
         return ResponseEntity.ok(account);
     }
 

@@ -1,12 +1,12 @@
 package ar.edu.utn.frbb.tup.model.person.enums;
 
-public enum TipoPersona {
+public enum PersonType {
     PERSONA_FISICA("Fisica"),
     PERSONA_JURIDICA("Juridica");
 
     private final String descripcion;
 
-    TipoPersona(String descripcion) {
+    PersonType(String descripcion) {
         this.descripcion = descripcion;
     }
 
@@ -14,8 +14,8 @@ public enum TipoPersona {
         return descripcion;
     }
 
-    public static TipoPersona fromString(String text) {
-        for (TipoPersona tipo : TipoPersona.values()) {
+    public static PersonType fromString(String text) {
+        for (PersonType tipo : PersonType.values()) {
             if (tipo.descripcion.equalsIgnoreCase(text)) {
                 return tipo;
             }

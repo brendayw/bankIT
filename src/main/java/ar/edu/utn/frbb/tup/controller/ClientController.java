@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping("/api/clients")
 @SecurityRequirement(name = "bearer-key")
 public class ClientController {
 
@@ -38,27 +38,19 @@ public class ClientController {
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         var client = service.createClient(dto, user);
-        var uri = uriComponentsBuilder.path("/api/clientes/{id}").buildAndExpand(client.getId()).toUri();
+        var uri = uriComponentsBuilder.path("/api/clients/{id}").buildAndExpand(client.getId()).toUri();
         return ResponseEntity.created(uri).body(new ClientDetailsDto(client));
     }
 
-    //obtiene todos los clientes
-//    @GetMapping
-//    @Parameter(name = "pagination", hidden = true)
-//    public ResponseEntity findAllClients(@PageableDefault(size = 10) Pageable pagination) {
-//        Page<ClientsListDto> clients = service.findAllClients(pagination);
-//        return ResponseEntity.ok(clients);
-//    }
-
     //busca cliente autenticado
     @GetMapping("/me")
-    public ResponseEntity<ClientDetailsDto> getClienteProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ClientDetailsDto> getClientProfile(@AuthenticationPrincipal User user) {
         ClientDetailsDto client = service.getOwnClientProfile(user);
         return ResponseEntity.ok(client);
     }
 
     //obtener todas las cuentas de un cliente por su dni
-    @GetMapping("/me/prestamos")
+    @GetMapping("/me/loans")
     @Parameter(name = "pagination", hidden = true)
     public ResponseEntity getAllLoansByClient(@AuthenticationPrincipal User user, @PageableDefault(size = 10) Pageable pagination) {
         Page<LoansListDto> loans = service.findAllLoansByAuthenticatedClient(user, pagination);
@@ -66,7 +58,7 @@ public class ClientController {
     }
 
     //obtener todos los prestamos de un cliente por su dni
-    @GetMapping("/me/cuentas")
+    @GetMapping("/me/accounts")
     @Parameter(name = "pagination", hidden = true)
     public ResponseEntity getAllAccountsByClient(@AuthenticationPrincipal User user, @PageableDefault(size = 10) Pageable pagination) {
         Page<AccountDto> accounts = service.findAllAccountsByAuthenticatedClient(user, pagination);
@@ -84,7 +76,7 @@ public class ClientController {
     //desactiva cliente
     @Transactional
     @DeleteMapping("/me")
-    public ResponseEntity desactivar(@AuthenticationPrincipal User user) {
+    public ResponseEntity delete(@AuthenticationPrincipal User user) {
         service.deactivateOwnClient(user);
         return ResponseEntity.noContent().build();
     }

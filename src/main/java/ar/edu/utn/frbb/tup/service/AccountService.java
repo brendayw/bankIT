@@ -1,18 +1,17 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.infra.exception.ValidacionException;
-import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNoExisteException;
+import ar.edu.utn.frbb.tup.infra.exception.ValidationException;
+import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNotFoundException;
 import ar.edu.utn.frbb.tup.model.account.Account;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDetailsDto;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountsListDto;
-import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaNoExisteException;
-import ar.edu.utn.frbb.tup.model.account.exceptions.CuentaYaExisteException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.AccountNotFoundException;
+import ar.edu.utn.frbb.tup.model.account.exceptions.AccountAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,34 +26,31 @@ public class AccountService {
     private ClientRepository clientRepository;
 
     public Account createAccount(Long clientDni, AccountDto dto) {
-        var client = clientRepository.findByPersonaDni(clientDni)
-                .orElseThrow(() -> new ClientNoExisteException("Cliente no encontrado con ID " + clientDni));
-        boolean exists = repository.existsByClientPersonaDniAndTipoCuentaAndTipoMoneda(dto.dniTitular(),
-                dto.tipoCuenta(), dto.tipoMoneda());
+        var client = clientRepository.findByPersonDni(clientDni)
+                .orElseThrow(() -> new ClientNotFoundException("Cliente no encontrado con ID " + clientDni));
+
+        boolean exists = repository.existsByClientPersonDniAndAccountTypeAndCurrencyType(dto.dni(),
+                dto.accountType(), dto.currencyType());
+
         if (exists) {
-            throw new CuentaYaExisteException("Ya existe una cuenta de tipo " + dto.tipoCuenta() + " con moneda "
-                    + dto.tipoMoneda());
+            throw new AccountAlreadyExistsException("Ya existe una cuenta de tipo " + dto.currencyType() + " con moneda "
+                    + dto.accountType());
         }
         Account account = new Account();
         account.setClient(client);
-        client.getCuentas().add(account);
+        client.getAccounts().add(account);
         return repository.save(account);
     }
 
-    //obtener todas las cuentas
-    public Page<AccountDto> findAllAccounts(Pageable pagination) {
-        return repository.findAll(pagination).map(AccountDto::new);
-    }
-
     //obtener cuenta por id
-    public AccountDetailsDto getAccountById(Long id, User authenticatedUser) {
+    public AccountDetailsDto findAccountById(Long id, User authenticatedUser) {
         var account = repository.findById(id)
-                .orElseThrow(() -> new CuentaNoExisteException("Cuenta con ID " + id + " no encontrada"));
+                .orElseThrow(() -> new AccountNotFoundException("Cuenta con ID " + id + " no encontrada"));
+
         var client = authenticatedUser.getClient();
         if (client == null || !account.getClient().getId().equals(client.getId())) {
-            throw new ValidacionException("No tenés permiso para acceder a esta cuenta.");
+            throw new ValidationException("No tenés permiso para acceder a esta cuenta.");
         }
-
         return new AccountDetailsDto(account);
     }
 
@@ -64,8 +60,7 @@ public class AccountService {
         if (client == null) {
             throw new IllegalStateException("El usuario no tiene cliente asociado");
         }
-
-        List<AccountDto> accounts = repository.findAccountsByClientPersonaDniAndActiveTrue(client.getPersona().getDni(),
+        List<AccountDto> accounts = repository.findAccountsByClientPersonDniAndActiveTrue(client.getPerson().getDni(),
                         pagination).stream()
                 .map(AccountDto::new)
                 .toList();
@@ -78,16 +73,13 @@ public class AccountService {
         if (client == null) {
             throw new IllegalStateException("El usuario no tiene cliente asociado");
         }
+
         var account = repository.findById(id)
-                .orElseThrow(() -> new CuentaNoExisteException("Cuenta no encontrada o no tenés permiso para acceder."));
-
+                .orElseThrow(() -> new AccountNotFoundException("Cuenta no encontrada o no tenés permiso para acceder."));
         if (!account.getClient().getId().equals(client.getId())) {
-            throw new ValidacionException("No tenés permiso para desactivar esta cuenta.");
+            throw new ValidationException("No tenés permiso para desactivar esta cuenta.");
         }
-
         account.deactivate();
         repository.save(account);
     }
-
-
 }

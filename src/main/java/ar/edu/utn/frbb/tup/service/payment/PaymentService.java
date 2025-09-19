@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.service.payment;
 
-import ar.edu.utn.frbb.tup.infra.exception.ValidacionException;
+import ar.edu.utn.frbb.tup.infra.exception.ValidationException;
 import ar.edu.utn.frbb.tup.model.loan.Loan;
 import ar.edu.utn.frbb.tup.model.payment.Payment;
 import ar.edu.utn.frbb.tup.model.payment.dto.PaymentDto;
@@ -40,14 +40,14 @@ public class PaymentService {
     }
 
     @Transactional
-    public void markAsPaid(User authenticatedUser, Long id) throws ValidacionException {
+    public void markAsPaid(User authenticatedUser, Long id) throws ValidationException {
         Payment payment = repository.findById(id)
-                .orElseThrow(() -> new ValidacionException("Pago no encontrado con ID: " + id));
+                .orElseThrow(() -> new ValidationException("Pago no encontrado con ID: " + id));
         if (!payment.getLoan().getClient().getUser().getId().equals(authenticatedUser.getId())) {
-            throw new ValidacionException("No tienes permiso para marcar esta cuota como pagada");
+            throw new ValidationException("No tienes permiso para marcar esta cuota como pagada");
         }
         if (payment.getPaid()) {
-            throw new ValidacionException("La cuota ya está pagada");
+            throw new ValidationException("La cuota ya está pagada");
         }
         payment.setPaid(true);
         payment.setPaymentDate(LocalDate.now());
@@ -65,7 +65,7 @@ public class PaymentService {
 
     //calcule el saldo restante a pagar del prestamo
     @Transactional(readOnly = true)
-    public double calculatePayment(User authenticatedUser, Long id) throws ValidacionException {
+    public double calculatePayment(User authenticatedUser, Long id) throws ValidationException {
         List<Payment> payments = repository.findByLoanId(id);
         return payments.stream()
                 .filter(p -> !p.getPaid())

@@ -1,7 +1,7 @@
 package ar.edu.utn.frbb.tup.model.account;
 
-import ar.edu.utn.frbb.tup.model.account.enums.TipoCuenta;
-import ar.edu.utn.frbb.tup.model.account.enums.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.account.enums.AccountType;
+import ar.edu.utn.frbb.tup.model.account.enums.CurrencyType;
 import ar.edu.utn.frbb.tup.model.client.Client;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import jakarta.persistence.*;
@@ -26,15 +26,17 @@ public class Account {
     private Client client;
 
     @Column(name = "fecha_creacion")
-    private LocalDate fechaCreacion;
+    private LocalDate creationDate;
 
     private Double balance;
 
     @Enumerated(EnumType.STRING)
-    private TipoCuenta tipoCuenta;
+    @Column(name = "tipo_cuenta")
+    private AccountType accountType;
 
     @Enumerated(EnumType.STRING)
-    private TipoMoneda tipoMoneda;
+    @Column(name = "tipo_moneda")
+    private CurrencyType currencyType;
 
     @Column(name = "estado")
     private boolean active;
@@ -42,21 +44,21 @@ public class Account {
     public Account(AccountDto dto) {
         this.id = null;
         this.active = true;
-        this.fechaCreacion = LocalDate.now();
+        this.creationDate = LocalDate.now();
         this.balance = dto.balance();
-        this.tipoCuenta = dto.tipoCuenta();
-        this.tipoMoneda = dto.tipoMoneda();
+        this.accountType = dto.accountType();
+        this.currencyType = dto.currencyType();
     }
 
     @Override
     public String toString() {
-        return "Cuenta: " +
+        return "Account: " +
                 "\nId =" + id +
-                "\nfechaCreacion=" + fechaCreacion +
-                "\nbalance=" + balance +
-                "\ntipoCuenta=" + tipoCuenta +
-                "\ntipoMoneda=" + tipoMoneda +
-                "\nestado=" + active;
+                "\nCreation Date=" + creationDate +
+                "\nBalance=" + balance +
+                "\nAccount Type=" + accountType +
+                "\nCurrency Type=" + currencyType +
+                "\nStatus=" + active;
     }
 
     public void deactivate() {

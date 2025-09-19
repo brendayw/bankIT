@@ -1,12 +1,12 @@
 package ar.edu.utn.frbb.tup.model.account.enums;
 
-public enum TipoCuenta {
+public enum AccountType {
     CUENTA_CORRIENTE("Corriente"),
     CAJA_AHORRO("Ahorro");
 
     private final String descripcion;
 
-    TipoCuenta(String descripcion) {
+    AccountType(String descripcion) {
         this.descripcion = descripcion;
     }
 
@@ -14,8 +14,8 @@ public enum TipoCuenta {
         return descripcion;
     }
 
-    public static TipoCuenta fromString(String text) {
-        for (TipoCuenta tipo : TipoCuenta.values()) {
+    public static AccountType fromString(String text) {
+        for (AccountType tipo : AccountType.values()) {
             if (tipo.descripcion.equalsIgnoreCase(text)) {
                 return tipo;
             }
@@ -23,4 +23,3 @@ public enum TipoCuenta {
         throw new IllegalArgumentException("No se pudo encontrar un TipoCuenta con la descripción: " + text);
     }
 }
-

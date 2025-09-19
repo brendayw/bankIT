@@ -1,7 +1,7 @@
 package ar.edu.utn.frbb.tup.model.client.dto;
 
 import ar.edu.utn.frbb.tup.model.client.Client;
-import ar.edu.utn.frbb.tup.model.person.enums.TipoPersona;
+import ar.edu.utn.frbb.tup.model.person.enums.PersonType;
 
 public record ClientsListDto(
         Long id,
@@ -9,16 +9,6 @@ public record ClientsListDto(
         String nombre,
         String telefono,
         String email,
-        TipoPersona tipoPersona
+        PersonType personType
 ) {
-    public ClientsListDto(Client client) {
-        this(
-                client.getId(),
-                client.getPersona().getApellido(),
-                client.getPersona().getNombre(),
-                client.getPersona().getTelefono(),
-                client.getPersona().getEmail(),
-                client.getTipoPersona()
-        );
-    }
 }

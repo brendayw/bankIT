@@ -1,12 +1,12 @@
 package ar.edu.utn.frbb.tup.model.account.enums;
 
-public enum TipoMoneda {
+public enum CurrencyType {
     PESOS("Pesos"),
     DOLARES("Dolares");
 
     private final String descripcion;
 
-    TipoMoneda(String descripcion) {
+    CurrencyType(String descripcion) {
         this.descripcion = descripcion;
     }
 
@@ -14,13 +14,12 @@ public enum TipoMoneda {
         return descripcion;
     }
 
-    public static TipoMoneda fromString(String text) {
-        for (TipoMoneda tipo : TipoMoneda.values()) {
+    public static CurrencyType fromString(String text) {
+        for (CurrencyType tipo : CurrencyType.values()) {
             if (tipo.descripcion.equalsIgnoreCase(text)) {
                 return tipo;
             }
         }
         throw new IllegalArgumentException("No se pudo encontrar un TipoMoneda con la descripción: " + text);
     }
-
 }

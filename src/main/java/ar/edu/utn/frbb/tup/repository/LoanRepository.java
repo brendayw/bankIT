@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
-    Page<Loan> findByClientPersonaDni(Long dni, Pageable pagination);
+    Page<Loan> findByClientPersonDni(Long dni, Pageable pagination);
 }
