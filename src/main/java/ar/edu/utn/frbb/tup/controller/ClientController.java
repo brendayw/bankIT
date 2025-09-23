@@ -10,28 +10,26 @@ import ar.edu.utn.frbb.tup.service.ClientService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/clients")
+@RequiredArgsConstructor
 @SecurityRequirement(name = "bearer-key")
 public class ClientController {
 
-    @Autowired
-    private ClientService service;
+    private final ClientService service;
 
     //crea cliente
-    @Transactional
     @PostMapping
     public ResponseEntity register(@RequestBody @Valid ClientDto dto, UriComponentsBuilder uriComponentsBuilder)  {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,7 +64,6 @@ public class ClientController {
     }
 
     //update datos del cliente
-    @Transactional
     @PutMapping("/me")
     public ResponseEntity updateClient(@AuthenticationPrincipal User user, @RequestBody @Valid UpdateClientDto dto) {
         ClientDetailsDto updated = service.updateOwnClientDetails(user, dto.telefono(), dto.email());
@@ -74,7 +71,6 @@ public class ClientController {
     }
 
     //desactiva cliente
-    @Transactional
     @DeleteMapping("/me")
     public ResponseEntity delete(@AuthenticationPrincipal User user) {
         service.deactivateOwnClient(user);

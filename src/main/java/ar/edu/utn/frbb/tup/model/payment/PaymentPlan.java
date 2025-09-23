@@ -11,6 +11,7 @@ import java.util.List;
 @Entity(name = "Plan")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")

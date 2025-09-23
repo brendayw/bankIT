@@ -2,16 +2,16 @@ package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.model.users.exceptions.UserNotFoundException;
 import ar.edu.utn.frbb.tup.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UserNotFoundException {

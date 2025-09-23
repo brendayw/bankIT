@@ -7,7 +7,7 @@ import ar.edu.utn.frbb.tup.model.payment.dto.PaymentDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.PaymentRepository;
 import ar.edu.utn.frbb.tup.repository.LoanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,30 +16,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class PaymentService {
 
-    @Autowired
-    private PaymentRepository repository;
+    private final PaymentRepository repository;
+    private final LoanRepository loanRepository;
 
-    @Autowired
-    private LoanRepository loanRepository;
-
-    public PaymentService(PaymentRepository repository, LoanRepository loanRepository) {
-        this.repository = repository;
-        this.loanRepository = loanRepository;
-    }
-
-    @Transactional
     public Payment createPayment(User authenticatedUser, Loan loan, Integer number, Double amount) {
-        Payment payment = new Payment();
-        payment.setLoan(loan);
-        payment.setPaymentNumber(number);
-        payment.setPaymentAmount(amount);
-        payment.setPaid(false);
+        Payment payment = Payment.builder()
+                .loan(loan)
+                .paymentNumber(number)
+                .paymentAmount(amount)
+                .paid(false)
+                .build();
+
         return repository.save(payment);
     }
 
-    @Transactional
     public void markAsPaid(User authenticatedUser, Long id) throws ValidationException {
         Payment payment = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Pago no encontrado con ID: " + id));

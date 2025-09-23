@@ -11,19 +11,21 @@ import ar.edu.utn.frbb.tup.model.account.exceptions.AccountAlreadyExistsExceptio
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class AccountService {
-    @Autowired
-    private AccountRepository repository;
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final AccountRepository repository;
+    private final ClientRepository clientRepository;
 
     public Account createAccount(Long clientDni, AccountDto dto) {
         var client = clientRepository.findByPersonDni(clientDni)
@@ -36,8 +38,14 @@ public class AccountService {
             throw new AccountAlreadyExistsException("Ya existe una cuenta de tipo " + dto.currencyType() + " con moneda "
                     + dto.accountType());
         }
-        Account account = new Account();
-        account.setClient(client);
+        Account account = Account.builder()
+                .client(client)
+                .creationDate(LocalDate.now())
+                .balance(dto.balance() != null ? dto.balance() : 0.0)
+                .accountType(dto.accountType())
+                .currencyType(dto.currencyType())
+                .active(true)
+                .build();
         client.getAccounts().add(account);
         return repository.save(account);
     }

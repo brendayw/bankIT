@@ -10,7 +10,6 @@ import java.util.*;
 public class CreditScoreService {
     private static final int MIN_SCORE = 500;
     private static final int MAX_SCORE = 1000;
-    private static final int SCORE_MINIMO = 600;
 
     public int calculateScore(Set<Loan> prestamos) {
         Random random = new Random();

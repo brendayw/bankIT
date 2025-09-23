@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Entity(name = "Cuota")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")

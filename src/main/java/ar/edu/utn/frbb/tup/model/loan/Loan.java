@@ -18,6 +18,7 @@ import java.util.List;
 @Entity(name = "Prestamo")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -55,6 +56,7 @@ public class Loan {
     @Column(name = "fecha_alta")
     private LocalDate registrationDate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> cuotas = new ArrayList<>();
 

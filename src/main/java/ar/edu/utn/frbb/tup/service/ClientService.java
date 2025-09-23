@@ -15,33 +15,30 @@ import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;
 import ar.edu.utn.frbb.tup.repository.LoanRepository;
 import ar.edu.utn.frbb.tup.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class ClientService {
 
-    @Autowired
-    private ClientRepository repository;
-
-    @Autowired
-    private LoanRepository loanRepository;
-
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final ClientRepository repository;
+    private final LoanRepository loanRepository;
+    private final AccountRepository accountRepository;
 
     public Client createClient(ClientDto dto, User user) {
         if (repository.existsByPersonDni(dto.person().dni())) {
-            throw new ClientAlreadyExistsException("El cliente con DNI " + dto.person().dni() + " ya existe.");
+            throw new ClientAlreadyExistsException("Cliente con DNI " + dto.person().dni() + " ya existe.");
         }
-        Client client = new Client(dto);
-        client.setUser(user);
-        user.setClient(client);
+        if (!user.canHaveClient()) {
+            throw new ValidationException("El usuario ya tiene un cliente asociado");
+        }
+        Client client = Client.createFromDto(dto);
+        client.associateWithUser(user);
         return repository.save(client);
     }
 

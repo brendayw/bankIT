@@ -7,7 +7,7 @@ import ar.edu.utn.frbb.tup.model.loan.Loan;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.LoanRepository;
 import ar.edu.utn.frbb.tup.repository.PaymentPlanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,19 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class PaymentPlanService {
 
-    @Autowired
-    private PaymentPlanRepository repository;
-
-    @Autowired
-    private LoanRepository loanRepository;
-
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentPlanRepository repository;
+    private final LoanRepository loanRepository;
+    private final PaymentService paymentService;
 
     //genera el plan de pago
-    @Transactional
     public List<Payment> generatePlan(User authenticatedUser, Loan loan, Double total, Integer months) {
         if (!loan.getClient().getUser().getId().equals(authenticatedUser.getId())) {
             throw new ValidationException("No tienes permiso para registrar préstamos para este cliente.");
@@ -43,7 +39,6 @@ public class PaymentPlanService {
         return payments;
     }
 
-    @Transactional
     public void createAndAssignPlan(User authenticatedUser, Loan loan, Integer months) {
         if (!loan.getClient().getUser().getId().equals(authenticatedUser.getId())) {
             throw new ValidationException("No tiene permiso para crear una plan de pago para este préstamo");

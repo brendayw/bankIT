@@ -8,25 +8,23 @@ import ar.edu.utn.frbb.tup.service.AccountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 @SecurityRequirement(name = "bearer-key")
 public class AccountController {
 
-    @Autowired
-    private AccountService service;
+    private final AccountService service;
 
     //crea cuenta
-    @Transactional
     @PostMapping
     public ResponseEntity register(@RequestBody @Valid AccountDto dto, UriComponentsBuilder uriComponentsBuilder) {
         var account = service.createAccount(dto.dni(), dto);
@@ -50,7 +48,6 @@ public class AccountController {
     }
 
     //desactiva cuenta
-    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@AuthenticationPrincipal User user, @PathVariable Long id) {
         service.deactivateAccount(user, id);

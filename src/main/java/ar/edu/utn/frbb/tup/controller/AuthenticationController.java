@@ -5,6 +5,7 @@ import ar.edu.utn.frbb.tup.model.users.dto.AuthenticationDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.model.users.dto.TokenJWTDto;
 import ar.edu.utn.frbb.tup.service.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,13 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthenticationController {
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AuthenticationManager manager;
+    private final TokenService tokenService;
+    private final AuthenticationManager manager;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDto dto) {

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Embeddable
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "dni")
