@@ -31,6 +31,7 @@ public class LoanCreationService {
         }
 
         Loan loan = simulatorService.createLoan(client, dto);
+        client.addLoan(loan);
         Loan savedLoan = repository.save(loan);
 
         if (savedLoan.getLoanStatus() == LoanStatus.APROBADO) {

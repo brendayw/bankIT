@@ -46,7 +46,7 @@ public class AccountService {
                 .currencyType(dto.currencyType())
                 .active(true)
                 .build();
-        client.getAccounts().add(account);
+        client.addAccount(account);
         return repository.save(account);
     }
 

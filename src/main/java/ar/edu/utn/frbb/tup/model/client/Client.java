@@ -86,15 +86,15 @@ public class Client {
         }
     }
 
-    public void removeUser() {
-        if (this.user != null) {
-            User currentUser = this.user;
-            this.user = null;
-            if (currentUser.getClient() == this) {
-                currentUser.removeClient();
-            }
-        }
-    }
+//    public void removeUser() {
+//        if (this.user != null) {
+//            User currentUser = this.user;
+//            this.user = null;
+//            if (currentUser.getClient() == this) {
+//                currentUser.removeClient();
+//            }
+//        }
+//    }
 
     public void addAccount(Account account) {
         if (this.accounts == null) {

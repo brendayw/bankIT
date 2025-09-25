@@ -28,7 +28,6 @@ public class LoanSimulatorService {
         //System.out.println("[INFO] Score calculado para el cliente " + client.getPerson().getDni() + ": " + score);
 
         Loan.LoanBuilder loanBuilder = Loan.builder()
-                .client(client)
                 .requestedAmount(request.requestedAmount())
                 .termInMonths(request.termInMonths())
                 .currencyType(request.currencyType())
@@ -37,20 +36,22 @@ public class LoanSimulatorService {
                 .cuotas(new ArrayList<>())
                 .paymentPlan(null);
 
+        Loan loan;
         if (score < MIN_APPROVAL_SCORE) {
-            return loanBuilder
+            loan = loanBuilder
                     .loanStatus(LoanStatus.RECHAZADO)
                     .totalAmount(0.0)
                     .interes(0.0)
                     .build();
         } else {
             Double interes = calculateRate(request.requestedAmount(), request.termInMonths());
-            return loanBuilder
+            loan = loanBuilder
                     .loanStatus(LoanStatus.APROBADO)
                     .interes(interes)
                     .totalAmount(request.requestedAmount() + interes)
                     .build();
         }
+        return loan;
     }
 
     public Double calculateRate(Double amount, Integer months) {
