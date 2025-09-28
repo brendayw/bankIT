@@ -1,20 +1,15 @@
-package ar.edu.utn.frbb.tup.service;
+package ar.edu.utn.frbb.tup.service.client;
 
 import ar.edu.utn.frbb.tup.infra.exception.ValidationException;
-import ar.edu.utn.frbb.tup.model.client.Client;
-import ar.edu.utn.frbb.tup.model.client.dto.ClientDetailsDto;
-import ar.edu.utn.frbb.tup.model.client.dto.ClientDto;
-import ar.edu.utn.frbb.tup.model.client.exceptions.ClientNotFoundException;
-import ar.edu.utn.frbb.tup.model.client.exceptions.ClientAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.account.Account;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
+import ar.edu.utn.frbb.tup.model.client.dto.ClientDetailsDto;
 import ar.edu.utn.frbb.tup.model.loan.Loan;
 import ar.edu.utn.frbb.tup.model.loan.dto.LoansListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.AccountRepository;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;
 import ar.edu.utn.frbb.tup.repository.LoanRepository;
-import ar.edu.utn.frbb.tup.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,23 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ClientService {
+public class ClientQueryService {
 
     private final ClientRepository repository;
     private final LoanRepository loanRepository;
     private final AccountRepository accountRepository;
-
-    public Client createClient(ClientDto dto, User user) {
-        if (repository.existsByPersonDni(dto.person().dni())) {
-            throw new ClientAlreadyExistsException("Cliente con DNI " + dto.person().dni() + " ya existe.");
-        }
-        if (!user.canHaveClient()) {
-            throw new ValidationException("El usuario ya tiene un cliente asociado");
-        }
-        Client client = Client.createFromDto(dto);
-        client.associateWithUser(user);
-        return repository.save(client);
-    }
 
     //obtener propio perfil
     public ClientDetailsDto getOwnClientProfile(User authenticatedUser) {
@@ -70,31 +53,5 @@ public class ClientService {
         Page<Account> accounts = accountRepository.findAccountsByClientPersonDniAndActiveTrue(
                 client.getPerson().getDni(), pagination);
         return accounts.map(AccountDto::new);
-    }
-
-    //update cliente
-    public ClientDetailsDto updateOwnClientDetails(User authenticatedUser, String telefono, String email) {
-        var client = authenticatedUser.getClient();
-        if (client == null) {
-            throw new ValidationException("El usuario no tiene un cliente asociado");
-        }
-        if (telefono != null && !telefono.isBlank()) {
-            client.getPerson().setTelefono(telefono);
-        }
-        if (email != null && !email.isBlank()) {
-            client.getPerson().setEmail(email);
-        }
-        repository.save(client);
-        return new ClientDetailsDto(client);
-    }
-
-    //desactivar cliente
-    public void deactivateOwnClient(User authenticatedUser) {
-        var client = authenticatedUser.getClient();
-        if (client == null) {
-            throw new ClientNotFoundException("El usuario no tiene un cliente asociado");
-        }
-        client.deactivate();
-        repository.save(client);
     }
 }

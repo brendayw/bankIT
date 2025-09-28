@@ -6,7 +6,10 @@ import ar.edu.utn.frbb.tup.model.client.dto.UpdateClientDto;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import ar.edu.utn.frbb.tup.model.loan.dto.LoansListDto;
 import ar.edu.utn.frbb.tup.model.users.User;
-import ar.edu.utn.frbb.tup.service.ClientService;
+import ar.edu.utn.frbb.tup.service.client.ClientCreationService;
+import ar.edu.utn.frbb.tup.service.client.ClientManagementService;
+import ar.edu.utn.frbb.tup.service.client.ClientQueryService;
+import ar.edu.utn.frbb.tup.service.client.ClientUpdateService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -27,7 +30,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @SecurityRequirement(name = "bearer-key")
 public class ClientController {
 
-    private final ClientService service;
+    private final ClientCreationService creationService;
+    private final ClientQueryService queryService;
+    private final ClientUpdateService updateService;
+    private final ClientManagementService managementService;
 
     //crea cliente
     @PostMapping
@@ -35,7 +41,7 @@ public class ClientController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
-        var client = service.createClient(dto, user);
+        var client = creationService.createClient(dto, user);
         var uri = uriComponentsBuilder.path("/api/clients/{id}").buildAndExpand(client.getId()).toUri();
         return ResponseEntity.created(uri).body(new ClientDetailsDto(client));
     }
@@ -43,7 +49,7 @@ public class ClientController {
     //busca cliente autenticado
     @GetMapping("/me")
     public ResponseEntity<ClientDetailsDto> getClientProfile(@AuthenticationPrincipal User user) {
-        ClientDetailsDto client = service.getOwnClientProfile(user);
+        ClientDetailsDto client = queryService.getOwnClientProfile(user);
         return ResponseEntity.ok(client);
     }
 
@@ -51,7 +57,7 @@ public class ClientController {
     @GetMapping("/me/loans")
     @Parameter(name = "pagination", hidden = true)
     public ResponseEntity getAllLoansByClient(@AuthenticationPrincipal User user, @PageableDefault(size = 10) Pageable pagination) {
-        Page<LoansListDto> loans = service.findAllLoansByAuthenticatedClient(user, pagination);
+        Page<LoansListDto> loans = queryService.findAllLoansByAuthenticatedClient(user, pagination);
         return ResponseEntity.ok(loans);
     }
 
@@ -59,21 +65,21 @@ public class ClientController {
     @GetMapping("/me/accounts")
     @Parameter(name = "pagination", hidden = true)
     public ResponseEntity getAllAccountsByClient(@AuthenticationPrincipal User user, @PageableDefault(size = 10) Pageable pagination) {
-        Page<AccountDto> accounts = service.findAllAccountsByAuthenticatedClient(user, pagination);
+        Page<AccountDto> accounts = queryService.findAllAccountsByAuthenticatedClient(user, pagination);
         return ResponseEntity.ok(accounts);
     }
 
     //update datos del cliente
     @PutMapping("/me")
     public ResponseEntity updateClient(@AuthenticationPrincipal User user, @RequestBody @Valid UpdateClientDto dto) {
-        ClientDetailsDto updated = service.updateOwnClientDetails(user, dto.telefono(), dto.email());
+        ClientDetailsDto updated = updateService.updateOwnClientDetails(user, dto.telefono(), dto.email());
         return ResponseEntity.ok(updated);
     }
 
     //desactiva cliente
     @DeleteMapping("/me")
     public ResponseEntity delete(@AuthenticationPrincipal User user) {
-        service.deactivateOwnClient(user);
+        managementService.deactivateOwnClient(user);
         return ResponseEntity.noContent().build();
     }
 }

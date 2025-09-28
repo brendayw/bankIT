@@ -19,6 +19,13 @@ public class TokenService {
     private String secret;
 
     public String generateToken(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("El usuario no puede ser nulo");
+        }
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("El username no puede ser nulo o vacío");
+        }
+
         try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
@@ -36,6 +43,10 @@ public class TokenService {
     }
 
     public String getSubject(String tokenJWT) {
+        if (tokenJWT == null || tokenJWT.trim().isEmpty()) {
+            throw new IllegalArgumentException("El token JWT no puede ser nulo o vacío");
+        }
+
         try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)

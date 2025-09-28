@@ -19,8 +19,22 @@ public class LoanPaymentService {
     private final PaymentService paymentService;
 
     public void payInstallment(User authenticatedUser, Long loanId, UpdatePaymentDto dto) {
+        if (authenticatedUser == null) {
+            throw new IllegalArgumentException("El usuario autenticado no puede ser nulo");
+        }
+        if (loanId == null) {
+            throw new IllegalArgumentException("El ID del préstamo no puede ser nulo");
+        }
+        if (dto == null) {
+            throw new IllegalArgumentException("El DTO de pago no puede ser nulo");
+        }
+
         var loan = repository.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException("Préstamo no encontrado"));
+
+        if (loan.getClient() == null || loan.getClient().getUser() == null) {
+            throw new ValidationException("No tenés permiso para pagar este préstamo");
+        }
 
         if (!loan.getClient().getUser().getId().equals(authenticatedUser.getId())) {
             throw new ValidationException("No tenés permiso para pagar este préstamo");
