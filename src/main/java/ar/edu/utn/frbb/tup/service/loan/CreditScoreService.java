@@ -2,12 +2,15 @@ package ar.edu.utn.frbb.tup.service.loan;
 
 import ar.edu.utn.frbb.tup.model.loan.Loan;
 import ar.edu.utn.frbb.tup.model.loan.enums.LoanStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class CreditScoreService {
+
     private static final int MIN_SCORE = 500;
     private static final int MAX_SCORE = 1000;
 

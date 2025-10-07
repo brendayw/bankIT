@@ -27,6 +27,10 @@ public class LoanQueryService {
         var loan = repository.findById(id)
                 .orElseThrow(() -> new LoanNotFoundException("Préstamo no encontrado"));
 
+        if (loan.getClient() == null || loan.getClient().getUser() == null) {
+            throw new ValidationException("No tenés permiso para este préstamo");
+        }
+
         if (!loan.getClient().getUser().getId().equals(authenticatedUser.getId())) {
             throw new ValidationException("No tenés permiso para este préstamo");
         }
@@ -36,6 +40,10 @@ public class LoanQueryService {
     public Page<LoansListDto> findLoansByClient(User authenticatedUser, Long dni, Pageable pagination) {
         var client = clientRepository.findByPersonDni(dni)
                 .orElseThrow(() -> new ClientNotFoundException("Cliente no encontrado"));
+
+        if (client.getUser() == null) {
+            throw new ValidationException("No tenés permiso para estos préstamos");
+        }
 
         if (!client.getUser().getId().equals(authenticatedUser.getId())) {
             throw new ValidationException("No tenés permiso para estos préstamos");

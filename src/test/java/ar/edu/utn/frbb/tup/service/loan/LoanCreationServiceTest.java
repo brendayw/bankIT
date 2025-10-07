@@ -91,5 +91,4 @@ public class LoanCreationServiceTest {
             loanCreationService.registerLoan(authenticatedUser, dto);
         });
     }
-
 }

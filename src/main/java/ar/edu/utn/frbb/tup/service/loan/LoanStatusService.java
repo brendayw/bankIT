@@ -18,6 +18,14 @@ public class LoanStatusService {
     private final LoanRepository repository;
 
     public void closeLoan(User authenticatedUser, Long id) {
+        if (authenticatedUser == null) {
+            throw new ValidationException("El usuario autenticado no puede ser null.");
+        }
+
+        if (id == null) {
+            throw new LoanNotFoundException("El ID del préstamo no puede ser null.");
+        }
+
         var loan = repository.findById(id)
                 .orElseThrow(() -> new LoanNotFoundException("Préstamo con ID " + id + " no encontrado."));
 

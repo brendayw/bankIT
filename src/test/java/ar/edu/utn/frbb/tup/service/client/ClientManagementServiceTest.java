@@ -128,7 +128,7 @@ public class ClientManagementServiceTest {
     }
 
     @Test
-    void deactivateOwnClientWithClientHavingRelationshipsDeactivatesSuccessfully() {
+    void deactivateOwnClient_WithClientHavingRelationships_DeactivatesSuccessfully() {
         User user = createUserWithClient(true);
         Client client = user.getClient();
 
@@ -141,7 +141,7 @@ public class ClientManagementServiceTest {
     }
 
     @Test
-    void deactivateOwnClientAfterClientModificationDeactivatesCorrectly() {
+    void deactivateOwnClient_AfterClientModification_DeactivatesCorrectly() {
         User user = createUserWithClient(true);
         Client client = user.getClient();
         client.getPerson().setTelefono("123456789");
