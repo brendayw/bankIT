@@ -9,20 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: bank_api_test
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -35,11 +21,9 @@ jobs:
 
       - name: Compilar y ejecutar tests con Maven
         env:
-          DB_URL: localhost:3306
-          MySQL_USERNAME: root
-          MYSQL_PASSWORD: root
           JWT_SECRET: 12345678
-        run: mvn -B clean verify
+        run: mvn -B clean verify -Dspring.profiles.active=test
 
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@v4
+        
