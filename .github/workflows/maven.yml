@@ -1,0 +1,41 @@
+name: Build and Test (Java + Maven)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # descarga el código del repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # instala java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # crea un application-test.properties para que los tests usen H2
+      - name: Configure test properties
+        run: |
+          mkdir -p src/test/resources
+          echo "spring.datasource.url=jdbc:h2:mem:testdb" > src/test/resources/application-test.properties
+          echo "spring.datasource.driver-class-name=org.h2.Driver" >> src/test/resources/application-test.properties
+          echo "spring.datasource.username=sa" >> src/test/resources/application-test.properties
+          echo "spring.datasource.password=" >> src/test/resources/application-test.properties
+          echo "spring.jpa.hibernate.ddl-auto=create-drop" >> src/test/resources/application-test.properties
+          echo "spring.jpa.show-sql=false" >> src/test/resources/application-test.properties
+          echo "spring.flyway.enabled=false" >> src/test/resources/application-test.properties
+
+      # compila el proyecto y corre los tests
+      - name: Build with Maven
+        run: mvn clean verify -B
