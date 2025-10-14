@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.integration.repository;
 
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.users.User;
 import ar.edu.utn.frbb.tup.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

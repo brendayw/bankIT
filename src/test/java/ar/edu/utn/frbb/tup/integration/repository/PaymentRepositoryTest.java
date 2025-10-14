@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.integration.repository;
 
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.client.Client;
 import ar.edu.utn.frbb.tup.model.loan.Loan;
 import ar.edu.utn.frbb.tup.model.payment.Payment;
@@ -33,47 +34,9 @@ public class PaymentRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        Person person = Person.builder()
-                .dni(12345678L)
-                .nombre("NombreTest")
-                .apellido("ApellidoTest")
-                .fechaNacimiento(LocalDate.now().minusYears(30))
-                .build();
-
-        Client client = Client.builder()
-                .person(person)
-                .registrationDate(LocalDate.now())
-                .build();
-        em.persist(client);
-
-        loan = Loan.builder()
-                .client(client)
-                .requestedAmount(1000.0)
-                .registrationDate(LocalDate.now())
-                .termInMonths(12)
-                .build();
-        em.persist(loan);
-
-        Payment payment1 = Payment.builder()
-                .paymentNumber(1)
-                .paymentAmount(100.0)
-                .paid(false)
-                .paymentDate(LocalDate.now())
-                .loan(loan)
-                .build();
-
-        Payment payment2 = Payment.builder()
-                .paymentNumber(2)
-                .paymentAmount(100.0)
-                .paid(false)
-                .paymentDate(LocalDate.now().plusMonths(1))
-                .loan(loan)
-                .build();
-
-        em.persist(payment1);
-        em.persist(payment2);
-
-        em.flush();
+        Client client = createClient();
+        loan = createLoan(client);
+        createPayments(loan);
     }
 
     @Test
@@ -106,5 +69,59 @@ public class PaymentRepositoryTest {
         assertThat(saved.getId()).isNotNull();
         List<Payment> payments = repository.findByLoanId(loan.getId());
         assertThat(payments).contains(saved);
+    }
+
+    //helpers
+    private Client createClient() {
+        Person person = Person.builder()
+                .dni(12345678L)
+                .nombre("NombreTest")
+                .apellido("ApellidoTest")
+                .email("testuse@email.com")
+                .telefono("2915748896")
+                .fechaNacimiento(LocalDate.now().minusYears(30))
+                .build();
+
+        Client client = Client.builder()
+                .person(person)
+                .registrationDate(LocalDate.now())
+                .build();
+        em.persist(client);
+        return client;
+    }
+
+    private Loan createLoan(Client client) {
+        var amount = 1000.0;
+        Loan loan = Loan.builder()
+                .client(client)
+                .requestedAmount(amount)
+                .registrationDate(LocalDate.now())
+                .termInMonths(12)
+                .totalAmount((amount * 0.40 / 100) + amount)
+                .build();
+        em.persist(loan);
+        return loan;
+    }
+
+    private void createPayments(Loan loan) {
+        Payment payment1 = Payment.builder()
+                .paymentNumber(1)
+                .paymentAmount(100.0)
+                .paid(false)
+                .paymentDate(LocalDate.now())
+                .loan(loan)
+                .build();
+
+        Payment payment2 = Payment.builder()
+                .paymentNumber(2)
+                .paymentAmount(100.0)
+                .paid(false)
+                .paymentDate(LocalDate.now().plusMonths(1))
+                .loan(loan)
+                .build();
+
+        em.persist(payment1);
+        em.persist(payment2);
+        em.flush();
     }
 }

@@ -29,36 +29,23 @@ public class LoanRepositoryTest {
     @Autowired
     private TestEntityManager em;
 
-    private Person person;
-    private Client client;
-
     @BeforeEach
     void setUp() {
-        person = Person.builder()
-                .dni(12345678L)
-                .nombre("NombreTest")
-                .apellido("ApellidoTest")
-                .fechaNacimiento(LocalDate.now().minusYears(30))
-                .build();
-
-        client = Client.builder()
-                .person(person)
-                .registrationDate(LocalDate.now())
-                .build();
-        em.persist(client);
-
-        em.flush();
+        em.clear();
     }
 
     @Test
     void givenExistingLoans_whenFindingByClientDni_thenReturnLoans() {
-        Loan loan1 = createLoan(1000.0);
-        Loan loan2 = createLoan(2000.0);
+        Client client = createClient(12345678L);
+
+        Loan loan1 = createLoan(client, 1000.0);
+        Loan loan2 = createLoan(client, 2000.0);
+
         em.persist(loan1);
         em.persist(loan2);
         em.flush();
-        Pageable pageable = PageRequest.of(0, 10);
 
+        Pageable pageable = PageRequest.of(0, 10);
         Page<Loan> result = repository.findByClientPersonDni(12345678L, pageable);
 
         assertThat(result.getContent()).hasSize(2);
@@ -75,13 +62,32 @@ public class LoanRepositoryTest {
     }
 
     // Helper
-    private Loan createLoan(Double amount) {
-        Loan loan = Loan.builder()
+    private Client createClient(Long dni) {
+        Person person = Person.builder()
+                .dni(dni)
+                .nombre("NombreTest")
+                .apellido("ApellidoTest")
+                .email("testuse@email.com")
+                .telefono("2915748896")
+                .fechaNacimiento(LocalDate.now().minusYears(22))
+                .build();
+
+        Client client = Client.builder()
+                .person(person)
+                .registrationDate(LocalDate.now())
+                .build();
+        em.persist(client);
+        em.flush();
+        return client;
+    }
+
+    private Loan createLoan(Client client, Double amount) {
+        return Loan.builder()
                 .client(client)
                 .requestedAmount(amount)
                 .registrationDate(LocalDate.now())
                 .termInMonths(12)
+                .totalAmount((amount * 0.4 / 100) + amount)
                 .build();
-        return loan;
     }
 }

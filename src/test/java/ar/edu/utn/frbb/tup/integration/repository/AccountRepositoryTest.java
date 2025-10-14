@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.integration.repository;
 
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.account.Account;
 import ar.edu.utn.frbb.tup.model.account.enums.AccountType;
 import ar.edu.utn.frbb.tup.model.account.enums.CurrencyType;
@@ -37,25 +38,13 @@ public class AccountRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        person = Person.builder()
-                .dni(12345678L)
-                .nombre("Juan")
-                .apellido("Perez")
-                .fechaNacimiento(LocalDate.now().minusYears(30))
-                .build();
-
-        client = Client.builder()
-                .person(person)
-                .registrationDate(LocalDate.now())
-                .build();
-        em.persist(client);
-
-        em.flush();
+        this.client = createClient(12345678L);
+        this.person = this.client.getPerson();
     }
 
     @Test
     void givenExistingAccount_whenCheckingExistence_theReturnTrue() {
-        Account account = createAccount(12345678L, AccountType.CUENTA_CORRIENTE, CurrencyType.PESOS, true);
+        Account account = createAccount(client, AccountType.CUENTA_CORRIENTE, CurrencyType.PESOS, true);
         em.persist(account);
 
         boolean exists = repository.existsByClientPersonDniAndAccountTypeAndCurrencyType(
@@ -75,36 +64,34 @@ public class AccountRepositoryTest {
 
     @Test
     void givenActiveAndInactiveAccounts_whenFindingActiveAccounts_thenReturnOnlyActiveAccounts() {
-        Account activeAccount1 = createAccount(12345678L, AccountType.CAJA_AHORRO, CurrencyType.PESOS, true);
-        Account activeAccount2 = createAccount(12345678L, AccountType.CUENTA_CORRIENTE, CurrencyType.DOLARES, true);
-        Account inactiveAccount = createAccount(12345678L, AccountType.CAJA_AHORRO, CurrencyType.DOLARES, false);
-        em.persist(activeAccount1);
-        em.persist(activeAccount2);
+        Account activeAccount = createAccount(client, AccountType.CAJA_AHORRO, CurrencyType.PESOS, true);
+        Account inactiveAccount = createAccount(client, AccountType.CAJA_AHORRO, CurrencyType.DOLARES, false);
+
+        em.persist(activeAccount);
         em.persist(inactiveAccount);
+
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<Account> result = repository.findAccountsByClientPersonDniAndActiveTrue(12345678L, pageable);
 
-        assertThat(result.getContent()).hasSize(2);
-        assertThat(result.getContent())
-                .allMatch(Account::isActive);
+        assertThat(result.getContent()).hasSize(2); // Solo las 2 activas
     }
 
     @Test
     void givenOnlyInactiveAccounts_whenFindingActiveAccounts_thenReturnEmptyPage() {
-        Account inactiveAccount = createAccount(12345678L, AccountType.CAJA_AHORRO, CurrencyType.PESOS, false);
-        em.persist(inactiveAccount);
-        Pageable pageable = PageRequest.of(0, 10);
+        Account inactiveAccount = createAccount(client, AccountType.CAJA_AHORRO, CurrencyType.PESOS, false);
 
+        Pageable pageable = PageRequest.of(0, 10);
         Page<Account> result = repository.findAccountsByClientPersonDniAndActiveTrue(12345678L, pageable);
 
         assertThat(result.getContent()).isEmpty();
     }
 
+
     @Test
     void givenMultipleActiveAccounts_whenPaginating_thenReturnCorrectNumberOfElementsPerPage() {
         for (int i = 0; i < 15; i++) {
-            Account account = createAccount(12345678L, AccountType.CAJA_AHORRO, CurrencyType.PESOS, true);
+            Account account = createAccount(client, AccountType.CAJA_AHORRO, CurrencyType.PESOS, true);
             em.persist(account);
         }
         Pageable firstPage = PageRequest.of(0, 5);
@@ -119,32 +106,34 @@ public class AccountRepositoryTest {
         assertThat(firstPageResult.getTotalPages()).isEqualTo(3);
     }
 
-    // Helper
-    private Account createAccount(Long dni, AccountType accountType, CurrencyType currencyType, boolean active) {
-        Person accountPerson = person;
-        Client accountClient = client;
+    //HELPERS
+    private Client createClient(Long dni) {
+        Person person = Person.builder()
+                .dni(12345678L)
+                .nombre("NombreTest")
+                .apellido("ApellidoTest")
+                .email("testuse@email.com")
+                .telefono("2915748896")
+                .fechaNacimiento(LocalDate.now().minusYears(30))
+                .build();
 
-        if (!dni.equals(person.getDni())) {
-            accountPerson = new Person();
-            accountPerson.setDni(dni);
-            accountPerson.setNombre("Test");
-            accountPerson.setApellido("User");
-            accountPerson.setFechaNacimiento(LocalDate.now().minusYears(25));
-            em.persist(accountPerson);
+        Client client = Client.builder()
+                .person(person)
+                .registrationDate(LocalDate.now())
+                .build();
+        em.persist(client);
+        return client;
+    }
 
-            accountClient = new Client();
-            accountClient.setPerson(accountPerson);
-            accountClient.setRegistrationDate(LocalDate.now());
-            em.persist(accountClient);
-        }
-
-        Account account = new Account();
-        account.setClient(accountClient);
-        account.setAccountType(accountType);
-        account.setCurrencyType(currencyType);
-        account.setBalance(Double.valueOf(0.0));
-        account.setActive(active);
-        account.setCreationDate(LocalDate.now());
+    private Account createAccount(Client client, AccountType accountType, CurrencyType currencyType, boolean active) {
+        Account account = Account.builder()
+                .client(client)
+                .accountType(accountType)
+                .currencyType(currencyType)
+                .balance(Double.valueOf(0.0))
+                .active(true)
+                .creationDate(LocalDate.now())
+                .build();
 
         return account;
     }

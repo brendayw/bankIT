@@ -1,6 +1,7 @@
 package ar.edu.utn.frbb.tup.integration.controller;
 
 import ar.edu.utn.frbb.tup.Application;
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.account.Account;
 import ar.edu.utn.frbb.tup.model.account.dto.AccountDto;
 import ar.edu.utn.frbb.tup.model.account.enums.AccountType;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Transactional
-public class AccountControllerIntegrationTest {
+public class AccountControllerIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private MockMvc mockMvc;

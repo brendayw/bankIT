@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.integration.repository;
 
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.payment.PaymentPlan;
 import ar.edu.utn.frbb.tup.repository.PaymentPlanRepository;
 import org.junit.jupiter.api.BeforeEach;

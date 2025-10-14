@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.integration.repository;
 
+import ar.edu.utn.frbb.tup.config.IntegrationTestBase;
 import ar.edu.utn.frbb.tup.model.client.Client;
 import ar.edu.utn.frbb.tup.model.person.Person;
 import ar.edu.utn.frbb.tup.repository.ClientRepository;
@@ -26,25 +27,9 @@ public class ClientRepositoryTest {
     @Autowired
     private TestEntityManager em;
 
-    private Person person;
-    private Client client;
-
     @BeforeEach
     void setUp() {
-        person = Person.builder()
-                .dni(12345678L)
-                .nombre("NombreTest")
-                .apellido("ApellidoTest")
-                .fechaNacimiento(LocalDate.now().minusYears(30))
-                .build();
-
-        client = Client.builder()
-                .person(person)
-                .registrationDate(LocalDate.now())
-                .build();
-        em.persist(client);
-
-        em.flush();
+        Client client = createClient();
     }
 
     @Test
@@ -74,6 +59,25 @@ public class ClientRepositoryTest {
         boolean exists = repository.existsByPersonDni(99999999L);
 
         assertThat(exists).isFalse();
+    }
+
+    //HELPERS
+    private Client createClient() {
+        Person person = Person.builder()
+                .dni(12345678L)
+                .nombre("NombreTest")
+                .apellido("ApellidoTest")
+                .email("testuse@email.com")
+                .telefono("2915748896")
+                .fechaNacimiento(LocalDate.now().minusYears(30))
+                .build();
+
+        Client client = Client.builder()
+                .person(person)
+                .registrationDate(LocalDate.now())
+                .build();
+        em.persist(client);
+        return client;
     }
 
 }
