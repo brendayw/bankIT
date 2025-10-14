@@ -24,6 +24,21 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # crea application-test.properties para tests
+      - name: Configure test properties
+        run: |
+          mkdir -p src/test/resources
+          cat << 'EOF' > src/test/resources/application-test.properties
+          spring.datasource.url=jdbc:h2:mem:testdb
+          spring.datasource.driver-class-name=org.h2.Driver
+          spring.datasource.username=sa
+          spring.datasource.password=
+          spring.jpa.hibernate.ddl-auto=create-drop
+          spring.jpa.show-sql=false
+          spring.flyway.enabled=false
+          spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+          EOF
+
       # compila el proyecto y corre los tests
       - name: Build with Maven
         run: mvn clean verify -B
