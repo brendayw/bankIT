@@ -24,19 +24,32 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # crea application-test.properties para tests
       - name: Configure test properties
         run: |
           mkdir -p src/test/resources
           cat << 'EOF' > src/test/resources/application-test.properties
-          spring.datasource.url=jdbc:h2:mem:testdb
+          # Database H2
+          spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
           spring.datasource.driver-class-name=org.h2.Driver
           spring.datasource.username=sa
           spring.datasource.password=
+          
+          # JPA
+          spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
           spring.jpa.hibernate.ddl-auto=create-drop
-          spring.jpa.show-sql=false
+          spring.jpa.show-sql=true
+          spring.jpa.properties.hibernate.format_sql=true
+          
+          # Flyway
           spring.flyway.enabled=false
-          spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+          
+          # JWT Security for Tests
+          app.jwt.secret=testSecretKeyForTestingPurposesOnly1234567890
+          app.jwt.expiration=86400000
+          
+          # Logging for debugging
+          logging.level.org.springframework.security=DEBUG
+          logging.level.ar.edu.utn.frbb.tup=DEBUG
           EOF
 
       # compila el proyecto y corre los tests
