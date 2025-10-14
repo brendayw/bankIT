@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Transactional
-public class LoanControllerIntegrationTest extends IntegrationTestBase {
+public class LoanControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

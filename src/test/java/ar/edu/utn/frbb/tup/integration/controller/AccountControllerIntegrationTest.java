@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @Transactional
-public class AccountControllerIntegrationTest extends IntegrationTestBase {
+public class AccountControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
