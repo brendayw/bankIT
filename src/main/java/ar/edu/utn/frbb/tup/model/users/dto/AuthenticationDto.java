@@ -1,6 +1,8 @@
 package ar.edu.utn.frbb.tup.model.users.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record AuthenticationDto(
-        String username,
-        String password) {
+        @NotBlank String username,
+        @NotBlank String password) {
 }
